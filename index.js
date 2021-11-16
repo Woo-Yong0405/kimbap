@@ -237,10 +237,10 @@ client.on("message", async (message) => {
     }
     if (command == "odd" || command == "even") {
         if (!parseInt(args[0])) {
-            
+
         }
         const randomInt = Math.ceil(Math.random()*10);
     }
 });
 
-client.login("OTA0MTY4MDY0OTM1OTQ4MzI5.YX3mIQ.npr4wHGnS5kX9MUPowukqsIHTfI");
+client.login(process.env.THING);
