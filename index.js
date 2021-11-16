@@ -243,4 +243,4 @@ client.on("message", async (message) => {
     }
 });
 
-client.login(process.env.THING);
+client.login("OTA0MTY4MDY0OTM1OTQ4MzI5.YX3mIQ.8fZBT_x1RujIDidOK-81_9RNiW4");
