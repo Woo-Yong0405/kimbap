@@ -1,14 +1,24 @@
 {
-  "name": "discordbot",
+  "name": "stocks-simulator-bot",
   "version": "1.0.0",
-  "description": "Discord Bot",
-  "main": "main.js",
+  "description": "A discord bot that you can play the stock market on",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Woo-Yong0405/kimbap.git"
+  },
   "author": "Woo Yong Seok",
   "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Woo-Yong0405/kimbap/issues"
+  },
+  "homepage": "https://github.com/Woo-Yong0405/kimbap#readme",
   "dependencies": {
-    "discord.js": "^12.2.0"
+    "discord.js": "^12.2.0",
+    "jsoning": "^0.12.22",
+    "nodemon": "^2.0.14"
   }
 }
