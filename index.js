@@ -1,8 +1,6 @@
 const { Client, MessageEmbed, Intents } = require("discord.js");
 const client = new Client({intents:[Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES]});
-const token = require("./token.json");
 const fb = require("./fb");
-const Jsoning = require("jsoning");
 
 const work = new Set();
 const tips = new Set();
