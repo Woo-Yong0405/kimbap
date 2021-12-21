@@ -1,13 +1,12 @@
-import firebase from "firebase";
-import {config} from "dotenv";
-config();
+const firebase = require("firebase");
+const asdf = require("./token.json");
 
 firebase.initializeApp({
-    apiKey: process.env.API_KEY,
-    authDomain: process.env.AUTH_DOMAIN,
-    projectId: process.env.PROJECT_ID
+    apiKey: asdf.API_KEY,
+    authDomain: asdf.AUTH_DOMAIN,
+    projectId: asdf.PROJECT_ID
 });
 
 const dbService = firebase.firestore();
 
-export default dbService
+module.exports = dbService;
