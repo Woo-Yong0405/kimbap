@@ -851,6 +851,7 @@ Bank: ${doc.data().bank}
                         message.reply("Say how much money by a number or all")
                     }
                 }})
+                
         } else {
             message.reply("Cannot find a user with id: " + message.author.id)
         }
