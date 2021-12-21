@@ -858,4 +858,4 @@ Bank: ${doc.data().bank}
     }
 	});
 
-client.login(token.TOKEN);
+client.login(process.env.TOKEN);
