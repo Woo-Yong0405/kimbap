@@ -1,7 +1,8 @@
 const { Client, MessageEmbed, Intents } = require("discord.js");
 const client = new Client({intents:[Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES]});
 const fb = require("./fb");
-
+const dotenv = require("dotenv");
+dotenv.config();
 const work = new Set();
 const tips = new Set();
 const ban = new Set();
