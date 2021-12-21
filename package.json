@@ -15,6 +15,9 @@
   "bugs": {
     "url": "https://github.com/Woo-Yong0405/kimbap/issues"
   },
+  "engines": {
+    "node": "16.13.1"
+  },
   "homepage": "https://github.com/Woo-Yong0405/kimbap#readme",
   "dependencies": {
     "discord-buttons": "^2.4.1",
