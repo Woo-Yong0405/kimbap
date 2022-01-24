@@ -231,6 +231,7 @@ client.on("interactionCreate", async (ia) => {
 })
 
 client.on("messageCreate", async (message) => {
+    console.log(message.author.id)
     if ((dbService.doc(`User Data/${message.author.id}`).get()).exists == false) {
         dbService.doc(`User Data/${message.author.id}`).set({
             wallet: 100,
@@ -241,7 +242,9 @@ client.on("messageCreate", async (message) => {
     let asdf = await dbService.doc(`Channel Data/${message.channel.id}`).get();
     let prefixes = asdf.data().prefix;
     if (!prefixes) {
-        database1.set(message.channel.id, "-");
+        dbService.doc(`Channel Data/${message.channel.id}`).set({
+            prefix: "-"
+        })
     }
     if (message.author.id != client.user.id && message.content.startsWith(prefixes) == true && !ban.has(message.author.id)) {
         const args = message.content.trim().split(/ +/g);
