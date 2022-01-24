@@ -231,14 +231,14 @@ client.on("interactionCreate", async (ia) => {
 })
 
 client.on("messageCreate", async (message) => {
-    console.log(message.author.id)
-    if ((dbService.doc(`User Data/${message.author.id}`).get()).exists == false) {
-        dbService.doc(`User Data/${message.author.id}`).set({
+    let meme = await dbService.doc(`User Data/${message.author.id}`).get();
+    let wallet = meme.data()
+    if (!wallet.wallet) {
+        dbService.doc(`User Data/${message.user.id}`).set({
             wallet: 100,
             bank: 0
         })
     }
-    let meme = await dbService.doc(`User Data/${message.author.id}`).get();
     let asdf = await dbService.doc(`Channel Data/${message.channel.id}`).get();
     let prefixes = asdf.data().prefix;
     if (!prefixes) {
