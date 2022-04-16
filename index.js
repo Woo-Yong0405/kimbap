@@ -29,6 +29,7 @@ client.on("interactionCreate", async (ia) => {
                             bank: 0
                         })
                         ia.update({"content": "Well.... You died, meaning a 1 minute ban AND losing all your money", "components": []});
+                        rr.delete(ia.user.id)
                     } else {
                         dbService.doc(`User Data/${ia.user.id}`).set({
                             wallet: meme.data().wallet + 100,
@@ -69,6 +70,7 @@ client.on("interactionCreate", async (ia) => {
                         bank: 0
                     })
                     ia.update({"content": "Well.... You died, meaning a 1 minute ban AND losing all your money", "components": []});
+                    rr.delete(ia.user.id)
                 } else {
                     dbService.doc(`User Data/${ia.user.id}`).set({
                         wallet: meme.data().wallet + 900,
@@ -109,6 +111,7 @@ client.on("interactionCreate", async (ia) => {
                         bank: 0
                     })
                     ia.update({"content": "Well.... You died, meaning a 1 minute ban AND losing all your money", "components": []});
+                    rr.delete(ia.user.id)
                 } else {
                     dbService.doc(`User Data/${ia.user.id}`).set({
                         wallet: meme.data().wallet + 9000,
@@ -149,6 +152,7 @@ client.on("interactionCreate", async (ia) => {
                         bank: 0
                     })
                     ia.update({"content": "Well.... You died, meaning a 1 minute ban AND losing all your money", "components": []});
+                    rr.delete(ia.user.id)
                 } else {
                     dbService.doc(`User Data/${ia.user.id}`).set({
                         wallet: meme.data().wallet + 90000,
@@ -189,6 +193,7 @@ client.on("interactionCreate", async (ia) => {
                         bank: 0
                     })
                     ia.update({"content": "Well.... You died, meaning a 1 minute ban AND losing all your money", "components": []});
+                    rr.delete(ia.user.id)
                 } else {
                     dbService.doc(`User Data/${ia.user.id}`).set({
                         wallet: meme.data().wallet + 900000,
@@ -201,23 +206,24 @@ client.on("interactionCreate", async (ia) => {
                 }
             } else if (ia.customId == "rr_1_no") {
                 ia.update({"content": "Wait what did you even do the command for", "components": []});
+                rr.delete(ia.user.id)
                 ;
             } else if (ia.customId == "rr_2_no") {
                 ia.update({"content": `${ia.user.username} walked away with only 100. COWARD`, "components": []});
+                rr.delete(ia.user.id)
                 ;
             } else if (ia.customId == "rr_3_no") {
                 ia.update({"content": `${ia.user.username} walked away with only 1000. COWARD`, "components": []});
+                rr.delete(ia.user.id)
                 ;
             } else if (ia.customId == "rr_4_no") {
                 ia.update({"content": `${ia.user.username} walked away with only 10000. COWARD`, "components": []});
+                rr.delete(ia.user.id)
                 ;
             } else if (ia.customId == "rr_5_no") {
                 ia.update({"content": `${ia.user.username} walked away with only 100000. COWARD`, "components": []});
+                rr.delete(ia.user.id)
             }
-            rr.delete(ia.user.id)
-        } else {
-            ia.user.createDM()
-            ia.user.send("fuck you")
         }
         if (tipsA.has(ia.user.id)) {
             switch (ia.customId) {
