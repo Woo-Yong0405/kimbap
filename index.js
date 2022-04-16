@@ -257,9 +257,6 @@ client.on("interactionCreate", async (ia) => {
                     break;
             }
             tipsA.delete(ia.user.id)
-        } else {
-            ia.user.createDM()
-            ia.user.send("fuck you")
         }
     }
 })
