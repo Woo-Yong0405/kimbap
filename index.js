@@ -1,13 +1,11 @@
 const { Client, MessageEmbed, Intents } = require("discord.js");
 const client = new Client({intents:[Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES]});
-const token = require("./token.json");
 const fb = require("./fb");
-const Jsoning = require("jsoning");
 
 const work = new Set();
-const tips = new Set();
 const ban = new Set();
-const jin = new Set();
+const rr = new Set();
+const tipsA = new Set();
 
 const dbService = fb;
 
@@ -18,61 +16,59 @@ client.once("ready", () => {
 client.on("interactionCreate", async (ia) => {
     let meme = await dbService.doc(`User Data/${ia.user.id}`).get();
     if (ia.isButton) {
-        if (ia.customId == "rr_1_yes") {
-            if (jin.has(ia.user.id) && !ban.has(ia.user.id)) {
+        if (rr.has(ia.user.id)) {
+            if (ia.customId == "rr_1_yes") {
                 const random = Math.floor(Math.random() * 6) + 1;
-                if (random === 3) {
-                    ban.add(ia.user.id);
-                    setTimeout(() => {
-                        ban.delete(ia.user.id);
-                    }, 864000)
-                    dbService.doc(`User Data/${ia.user.id}`).set({
-                        wallet: 0,
-                        bank: 0
-                    })
-                    ia.update({"content": "Well.... You died, meaning a 24 hour ban AND losing all your money", "components": []});
-                } else {
-                    dbService.doc(`User Data/${ia.user.id}`).set({
-                        wallet: meme.data().wallet + 100,
-                        bank: meme.data().bank
-                    })
-                    ia.update({
-                        "content": "You got 100. Now you have a 2 out of 6 chance of dying, do you still wish to continue?",
-                        "components": [
-                            {
-                                "type": 1,
-                                "components": [
-                                    {
-                                        "type": 2,
-                                        "label": "Yes",
-                                        "style": "SUCCESS",
-                                        "custom_id": "rr_2_yes"
-                                    },
-                                    {
-                                        "type": 2,
-                                        "label": "No",
-                                        "style": "DANGER",
-                                        "custom_id": "rr_2_no"
-                                    }
-                                ]
-                            }
-                        ]
-                    });
-                }
-            }
-        } else if (ia.customId == "rr_2_yes") {
-            const random = Math.floor(Math.random() * 6) + 1;
-            if (jin.has(ia.user.id) && !ban.has(ia.user.id)) {
+                    if (random === 3) {
+                        ban.add(ia.user.id);
+                        setTimeout(() => {
+                            ban.delete(ia.user.id);
+                        }, 60000)
+                        dbService.doc(`User Data/${ia.user.id}`).set({
+                            wallet: 0,
+                            bank: 0
+                        })
+                        ia.update({"content": "Well.... You died, meaning a 1 minute ban AND losing all your money", "components": []});
+                    } else {
+                        dbService.doc(`User Data/${ia.user.id}`).set({
+                            wallet: meme.data().wallet + 100,
+                            bank: meme.data().bank
+                        })
+                        ia.update({
+                            "content": "You got 100. Now you have a 2 out of 6 chance of dying, do you still wish to continue?",
+                            "components": [
+                                {
+                                    "type": 1,
+                                    "components": [
+                                        {
+                                            "type": 2,
+                                            "label": "Yes",
+                                            "style": "SUCCESS",
+                                            "custom_id": "rr_2_yes"
+                                        },
+                                        {
+                                            "type": 2,
+                                            "label": "No",
+                                            "style": "DANGER",
+                                            "custom_id": "rr_2_no"
+                                        }
+                                    ]
+                                }
+                            ]
+                        });
+                    }
+            } else if (ia.customId == "rr_2_yes") {
+                const random = Math.floor(Math.random() * 6) + 1;
                 if (random == 1 || random == 5) {
                     ban.add(ia.user.id);
                     setTimeout(() => {
                         ban.delete(ia.user.id);
-                    }, 864000)
+                    }, 60000)
                     dbService.doc(`User Data/${ia.user.id}`).set({
                         wallet: 0,
                         bank: 0
                     })
-                    ia.update({"content": "Well.... You died, meaning a 24 hour ban AND losing all your money", "components": []});
+                    ia.update({"content": "Well.... You died, meaning a 1 minute ban AND losing all your money", "components": []});
                 } else {
                     dbService.doc(`User Data/${ia.user.id}`).set({
                         wallet: meme.data().wallet + 900,
@@ -101,20 +97,18 @@ client.on("interactionCreate", async (ia) => {
                         ]
                     });
                 }
-            }
-        } else if (ia.customId == "rr_3_yes") {
-            const random = Math.floor(Math.random() * 6) + 1;
-            if (jin.has(ia.user.id) && !ban.has(ia.user.id)) {
+            } else if (ia.customId == "rr_3_yes") {
+                const random = Math.floor(Math.random() * 6) + 1;
                 if (random == 1 || random == 5 || random == 4) {
                     ban.add(ia.user.id);
                     setTimeout(() => {
                         ban.delete(ia.user.id);
-                    }, 864000)
+                    }, 60000)
                     dbService.doc(`User Data/${ia.user.id}`).set({
                         wallet: 0,
                         bank: 0
                     })
-                    ia.update({"content": "Well.... You died, meaning a 24 hour ban AND losing all your money", "components": []});
+                    ia.update({"content": "Well.... You died, meaning a 1 minute ban AND losing all your money", "components": []});
                 } else {
                     dbService.doc(`User Data/${ia.user.id}`).set({
                         wallet: meme.data().wallet + 9000,
@@ -143,20 +137,18 @@ client.on("interactionCreate", async (ia) => {
                         ]
                     });
                 }
-            }
-        } else if (ia.customId == "rr_4_yes") {
-            const random = Math.floor(Math.random() * 6) + 1;
-            if (jin.has(ia.user.id) && !ban.has(ia.user.id)) {
+            } else if (ia.customId == "rr_4_yes") {
+                const random = Math.floor(Math.random() * 6) + 1;
                 if (random == 1 || random == 5 || random == 2 || random == 4) {
                     ban.add(ia.user.id);
                     setTimeout(() => {
                         ban.delete(ia.user.id);
-                    }, 864000)
+                    }, 60000)
                     dbService.doc(`User Data/${ia.user.id}`).set({
                         wallet: 0,
                         bank: 0
                     })
-                    ia.update({"content": "Well.... You died, meaning a 24 hour ban AND losing all your money", "components": []});
+                    ia.update({"content": "Well.... You died, meaning a 1 minute ban AND losing all your money", "components": []});
                 } else {
                     dbService.doc(`User Data/${ia.user.id}`).set({
                         wallet: meme.data().wallet + 90000,
@@ -185,20 +177,18 @@ client.on("interactionCreate", async (ia) => {
                         ]
                     });
                 }
-            }
-        } else if (ia.customId == "rr_5_yes") {
-            const random = Math.floor(Math.random() * 6) + 1;
-            if (jin.has(ia.user.id) && !ban.has(ia.user.id)) {
+            } else if (ia.customId == "rr_5_yes") {
+                const random = Math.floor(Math.random() * 6) + 1;
                 if (random == 1 || random == 5 || random == 2 || random == 3 || random == 6) {
                     ban.add(ia.user.id);
                     setTimeout(() => {
                         ban.delete(ia.user.id);
-                    }, 864000)
+                    }, 60000)
                     dbService.doc(`User Data/${ia.user.id}`).set({
                         wallet: 0,
                         bank: 0
                     })
-                    ia.update({"content": "Well.... You died, meaning a 24 hour ban AND losing all your money", "components": []});
+                    ia.update({"content": "Well.... You died, meaning a 1 minute ban AND losing all your money", "components": []});
                 } else {
                     dbService.doc(`User Data/${ia.user.id}`).set({
                         wallet: meme.data().wallet + 900000,
@@ -208,45 +198,93 @@ client.on("interactionCreate", async (ia) => {
                         "content": `Congratulations, ${ia.user.username} walked away with 1000000`,
                         "components": []
                     });
-                    jin.clear();
                 }
+            } else if (ia.customId == "rr_1_no") {
+                ia.update({"content": "Wait what did you even do the command for", "components": []});
+                ;
+            } else if (ia.customId == "rr_2_no") {
+                ia.update({"content": `${ia.user.username} walked away with only 100. COWARD`, "components": []});
+                ;
+            } else if (ia.customId == "rr_3_no") {
+                ia.update({"content": `${ia.user.username} walked away with only 1000. COWARD`, "components": []});
+                ;
+            } else if (ia.customId == "rr_4_no") {
+                ia.update({"content": `${ia.user.username} walked away with only 10000. COWARD`, "components": []});
+                ;
+            } else if (ia.customId == "rr_5_no") {
+                ia.update({"content": `${ia.user.username} walked away with only 100000. COWARD`, "components": []});
             }
-        } else if (ia.customId == "rr_1_no") {
-            ia.update({"content": "Wait what did you even do the command for", "components": []});
-            jin.clear();
-        } else if (ia.customId == "rr_2_no") {
-            ia.update({"content": `${ia.user.username} walked away with only 100. COWARD`, "components": []});
-            jin.clear();
-        } else if (ia.customId == "rr_3_no") {
-            ia.update({"content": `${ia.user.username} walked away with only 1000. COWARD`, "components": []});
-            jin.clear();
-        } else if (ia.customId == "rr_4_no") {
-            ia.update({"content": `${ia.user.username} walked away with only 10000. COWARD`, "components": []});
-            jin.clear();
-        } else if (ia.customId == "rr_5_no") {
-            ia.update({"content": `${ia.user.username} walked away with only 100000. COWARD`, "components": []});
-            jin.clear();
+            rr.delete(ia.user.id)
+        } else {
+            ia.user.createDM()
+            ia.user.send("fuck you")
+        }
+        if (tipsA.has(ia.user.id)) {
+            switch (ia.customId) {
+                case "tips__get":
+                    dbService.doc(`Tips/${ia.user.id}`).get().then((doc) => {
+                        ia.update({"content": `${ia.user.username} got ${doc.data().tips} out of the tipbox.`, "components": []})
+                        dbService.doc(`User Data/${ia.user.id}`).get().then((adoc) => {
+                            dbService.doc(`User Data/${ia.user.id}`).set({
+                                wallet: adoc.data().wallet + doc.data().tips,
+                                bank: adoc.data().bank
+                            })
+                            dbService.doc(`Tips/${ia.user.id}`).set({
+                                tips: 0
+                            })
+                        })
+                    })
+                    break;
+                case "tips__wait":
+                    const boolTip = Math.round(Math.random()) == 1
+                    ia.update({"content": `Waiting for a person kind enough to give tips.....`, "components": []})
+                    setTimeout(() => {
+                        if (boolTip) {
+                            ia.channel.send({"content": `Nobody wants to give you tips...`, "components": []})
+                        } else {
+                            const salary = Math.round(Math.random() * 2000);
+                            dbService.doc(`Tips/${ia.user.id}`).get().then((doc) => {
+                                dbService.doc(`Tips/${ia.user.id}`).set({
+                                    tips: doc.data().tips + salary
+                                })
+                            })
+                            ia.channel.send({"content": "Wow! A kind person just put " + salary + " into your tipbox!", "components": []})
+                        }
+                    }, 20000)
+                    break;
+                case "tips__cancel":
+                    ia.update({"content": "Wait what did you even do the command for", "components": []});
+                    break;
+            }
+            tipsA.delete(ia.user.id)
+        } else {
+            ia.user.createDM()
+            ia.user.send("fuck you")
         }
     }
 })
 
 client.on("messageCreate", async (message) => {
     let meme = await dbService.doc(`User Data/${message.author.id}`).get();
-    let wallet = meme.data()
-    if (!wallet.wallet) {
-        dbService.doc(`User Data/${message.user.id}`).set({
+    if (!meme.exists) {
+        dbService.doc(`User Data/${message.author.id}`).set({
             wallet: 100,
-            bank: 0
+            bank: 0,
         })
     }
     let asdf = await dbService.doc(`Channel Data/${message.channel.id}`).get();
-    let prefixes = asdf.data().prefix;
-    if (!prefixes) {
+    if (!asdf.exists) {
         dbService.doc(`Channel Data/${message.channel.id}`).set({
             prefix: "-"
         })
     }
-    if (message.author.id != client.user.id && message.content.startsWith(prefixes) == true && !ban.has(message.author.id)) {
+    let tips = await dbService.doc(`Tips/${message.author.id}`).get();
+    if (!tips.exists) {
+        dbService.doc(`Tips/${message.author.id}`).set({
+            tips: 0
+        })
+    }
+    if (message.author.id != client.user.id && message.content.startsWith(asdf.data().prefix) == true && !ban.has(message.author.id)) {
         const args = message.content.trim().split(/ +/g);
         const command = args[0].substring(1).toLowerCase();
         if (message.mentions.users.size == 0) {
@@ -255,7 +293,9 @@ client.on("messageCreate", async (message) => {
         } else if (command == "prefix" || command == "p") {
             if (args[1]) {
                 if (args[1].length == 1) {
-                    database1.set(message.channel.id, `${args[1]}`)
+                    dbService.doc(`Channel Data/${message.channel.id}`).set({
+                        prefix: args[1],
+                    })
                     message.channel.send("@everyone, The prefix has been changed to: " + args[1])
                 } else {
                     message.reply("Your new prefix has to contain only 1 character");
@@ -286,27 +326,34 @@ client.on("messageCreate", async (message) => {
                     }, 60000);
             }
         } else if (command == "tips" || command == "t") {
-            if (tips.has(message.author.id)) {
-                    message.reply(`Your cooldown hasn't ended yet`)
-                    } else {
-                        const salary = Math.floor(Math.random() * 1000);
-                        const ddd = new MessageEmbed()
-                        .setTitle(`${message.author.username}'s tips`)
-                        .setDescription(`
-                    You collected your tips and got ${salary}
-                    `)
-                    .setColor("GREEN")
-                    .setTimestamp();
-                        message.channel.send({embeds:[ddd]});
-                        dbService.doc(`User Data/${message.author.id}`).set({
-                            wallet: meme.data().wallet + salary,
-                            bank: meme.data().bank
-                        });
-                    tips.add(message.author.id);
-                    setTimeout(() => {
-                        tips.delete(message.author.id);
-                    }, 60000);
-            }
+            tipsA.add(message.author.id)
+            dbService.doc(`Tips/${message.author.id}`).get().then((doc) => {
+                const msg = message.channel.send({"content": `${message.author.username}'s tipbox contains ${doc.data().tips}`, "components": [
+                    {
+                        "type": 1,
+                        "components": [
+                            {
+                                "type": 2,
+                                "label": "Get",
+                                "style": "SUCCESS",
+                                "customId": "tips__get"
+                            },
+                            {
+                                "type": 2,
+                                "label": "Wait",
+                                "style": "PRIMARY",
+                                "customId": "tips__wait"
+                            },
+                            {
+                                "type": 2,
+                                "label": "Cancel",
+                                "style": "DANGER",
+                                "customId": "tips__cancel"
+                            }
+                        ]
+                    }
+                ]})
+            })
         } else if (command == "balance" || command == "bal") {
             if (message.mentions.users.size == 0) {
                 const ddd = new MessageEmbed()
@@ -330,7 +377,7 @@ client.on("messageCreate", async (message) => {
                 .setTimestamp();    
                 message.channel.send({embeds:[ddd]})
             } else {
-                message.channel.send("That person does not use this bot");
+                message.channel.send("Cannot find a user with id: " + message.mentions.users.first().id);
             }
         } else if (command == "deposit" || command == "dep") {
             if(parseInt(args[1]) > meme.data().wallet) {
@@ -763,7 +810,7 @@ You lost all your money
             }
             }
         } else if (command == "rr") {
-            jin.add(message.author.id);
+            rr.add(message.author.id);
             message.channel.send({
                 "content": "You have a 1 out of 6 chance of dying, do you still wish to continue?",
                 "components": [
