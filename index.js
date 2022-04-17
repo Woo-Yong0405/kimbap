@@ -1017,7 +1017,7 @@ Bank: ${doc.data().bank}
                             message.reply("Why tf are you trying to rob yourself")
                         }
                     } else {
-                        message.reply("Please specify who you're robbing")
+                        message.reply("Please specify who you're robbing");
                     }
                 }
             })
