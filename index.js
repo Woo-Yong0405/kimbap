@@ -1,4 +1,4 @@
-const { Client, MessageEmbed, Intents } = require("discord.js");
+const { Client, MessageEmbed, Intents, BaseClient } = require("discord.js");
 const client = new Client({intents:[Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES]});
 const fb = require("./fb");
 
@@ -6,8 +6,16 @@ const work = new Set();
 const ban = new Set();
 const rr = new Set();
 const tipsA = new Set();
+const rob = new Set();
 
 const dbService = fb;
+
+function death(id) {
+    ban.add(id);
+    setTimeout(() => {
+        ban.delete(ia.user.id);
+    }, 60000)
+}
 
 client.once("ready", () => {
 	console.log(`Logged in as ${client.user.tag}`);
@@ -20,10 +28,7 @@ client.on("interactionCreate", async (ia) => {
             if (ia.customId == "rr_1_yes") {
                 const random = Math.floor(Math.random() * 6) + 1;
                     if (random === 3) {
-                        ban.add(ia.user.id);
-                        setTimeout(() => {
-                            ban.delete(ia.user.id);
-                        }, 60000)
+                        death(ia.user.id)
                         dbService.doc(`User Data/${ia.user.id}`).set({
                             wallet: 0,
                             bank: 0
@@ -61,10 +66,7 @@ client.on("interactionCreate", async (ia) => {
             } else if (ia.customId == "rr_2_yes") {
                 const random = Math.floor(Math.random() * 6) + 1;
                 if (random == 1 || random == 5) {
-                    ban.add(ia.user.id);
-                    setTimeout(() => {
-                        ban.delete(ia.user.id);
-                    }, 60000)
+                    death(ia.user.id)
                     dbService.doc(`User Data/${ia.user.id}`).set({
                         wallet: 0,
                         bank: 0
@@ -102,10 +104,7 @@ client.on("interactionCreate", async (ia) => {
             } else if (ia.customId == "rr_3_yes") {
                 const random = Math.floor(Math.random() * 6) + 1;
                 if (random == 1 || random == 5 || random == 4) {
-                    ban.add(ia.user.id);
-                    setTimeout(() => {
-                        ban.delete(ia.user.id);
-                    }, 60000)
+                    death(ia.user.id)
                     dbService.doc(`User Data/${ia.user.id}`).set({
                         wallet: 0,
                         bank: 0
@@ -143,10 +142,7 @@ client.on("interactionCreate", async (ia) => {
             } else if (ia.customId == "rr_4_yes") {
                 const random = Math.floor(Math.random() * 6) + 1;
                 if (random == 1 || random == 5 || random == 2 || random == 4) {
-                    ban.add(ia.user.id);
-                    setTimeout(() => {
-                        ban.delete(ia.user.id);
-                    }, 60000)
+                    death(ia.user.id)
                     dbService.doc(`User Data/${ia.user.id}`).set({
                         wallet: 0,
                         bank: 0
@@ -184,10 +180,7 @@ client.on("interactionCreate", async (ia) => {
             } else if (ia.customId == "rr_5_yes") {
                 const random = Math.floor(Math.random() * 6) + 1;
                 if (random == 1 || random == 5 || random == 2 || random == 3 || random == 6) {
-                    ban.add(ia.user.id);
-                    setTimeout(() => {
-                        ban.delete(ia.user.id);
-                    }, 60000)
+                    death(ia.user.id)
                     dbService.doc(`User Data/${ia.user.id}`).set({
                         wallet: 0,
                         bank: 0
@@ -264,6 +257,95 @@ client.on("interactionCreate", async (ia) => {
             }
             tipsA.delete(ia.user.id)
         }
+        if (rob.has(ia.user.id)) {
+            switch (ia.customId) {
+                case "rob__yes":
+                    const chance = Math.round(Math.random()*20);
+                    const msg = await client.channels.cache.get(ia.message.reference.channelId).messages.fetch(ia.message.reference.messageId);
+                    const victim = msg.mentions.users.first().id;
+                    const robber = msg.author.id;
+                    if (chance <= 10) {
+                        ia.update({"content": "You died, meaning a 1 minute ban AND losing all your money. That's what you get for being so greedy lol", "components": []});
+                        death(robber)
+                    } else if (chance <= 16) {
+                        dbService.doc(`User Data/${victim}`).get().then((doc) => {
+                            const netWorth = doc.data().wallet + doc.data().bank
+                            if (netWorth/10 > doc.data().wallet) {
+                                dbService.doc(`User Data/${victim}`).set({
+                                    wallet: 0,
+                                    bank: doc.data().bank - (netWorth/10 - doc.data().wallet)
+                                })
+                                dbService.doc(`User Data/${robber}`).get().then((docs) => {
+                                    dbService.doc(`User Data/${robber}`).set({
+                                        wallet: docs.data().wallet + netWorth/10,
+                                        bank: docs.data().bank
+                                    })
+                                })
+                            } else {
+                                dbService.doc(`User Data/${victim}`).set({
+                                    wallet: doc.data().wallet-netWorth/10,
+                                    bank: doc.data().bank
+                                })
+                                dbService.doc(`User Data/${robber}`).get().then((docs) => {
+                                    dbService.doc(`User Data/${robber}`).set({
+                                        wallet: docs.data().wallet + netWorth/10,
+                                        bank: docs.data().bank
+                                    })
+                                })
+                            }
+                        })
+                        ia.update({"content": `${msg.author.username} just stole 10% of everything ${msg.mentions.users.first().username} owns`, "components": []});
+                    } else if (chance <= 19) {
+                        dbService.doc(`User Data/${victim}`).get().then((doc) => {
+                            const netWorth = doc.data().wallet + doc.data().bank
+                            if (netWorth/2 > doc.data().wallet) {
+                                dbService.doc(`User Data/${victim}`).set({
+                                    wallet: 0,
+                                    bank: doc.data().bank - (netWorth/2 - doc.data().wallet)
+                                })
+                                dbService.doc(`User Data/${robber}`).get().then((docs) => {
+                                    dbService.doc(`User Data/${robber}`).set({
+                                        wallet: docs.data().wallet + netWorth/2,
+                                        bank: docs.data().bank
+                                    })
+                                })
+                            } else {
+                                dbService.doc(`User Data/${victim}`).set({
+                                    wallet: doc.data().wallet-netWorth/2,
+                                    bank: doc.data().bank
+                                })
+                                dbService.doc(`User Data/${robber}`).get().then((docs) => {
+                                    dbService.doc(`User Data/${robber}`).set({
+                                        wallet: docs.data().wallet + netWorth/2,
+                                        bank: docs.data().bank
+                                    })
+                                })
+                            }
+                            ia.update({"content": `${msg.author.username} just stole half of everything ${msg.mentions.users.first().username} owns`, "components": []});
+                        })
+                    } else {
+                        dbService.doc(`User Data/${victim}`).get().then((doc) => {
+                            const netWorth = doc.data().wallet + doc.data().bank
+                            dbService.doc(`User Data/${victim}`).set({
+                                wallet: 0,
+                                bank: 0
+                            })
+                            dbService.doc(`User Data/${robber}`).get().then((docs) => {
+                                dbService.doc(`User Data/${robber}`).set({
+                                    wallet: docs.data().wallet + netWorth,
+                                    bank: docs.data().bank
+                                })
+                            })
+                        })
+                        ia.update({"content": `Wow ${msg.author.username} just stole literally EVERYTHING ${msg.mentions.users.first().username} owns!`, "components": []});
+                    }
+                    break;
+                case "rob__no":
+                    ia.update({"content": "Wait what did you even do the command for", "components": []});
+                    break;
+            }
+            rob.delete(ia.user.id)
+        }
     }
 })
 
@@ -331,7 +413,7 @@ client.on("messageCreate", async (message) => {
         } else if (command == "tips" || command == "t") {
             tipsA.add(message.author.id)
             dbService.doc(`Tips/${message.author.id}`).get().then((doc) => {
-                const msg = message.channel.send({"content": `${message.author.username}'s tipbox contains ${doc.data().tips}`, "components": [
+                message.channel.send({"content": `${message.author.username}'s tipbox contains ${doc.data().tips}`, "components": [
                     {
                         "type": 1,
                         "components": [
@@ -836,12 +918,13 @@ You lost all your money
                     }
                 ]
             });
+        } else if (command == "rob") {
+            console.log(args[1])
         } else {
             message.channel.send("That is not a command")
         }
     } else {
         const asdf = message.mentions.users.first().id;
-        if ((dbService.doc("User Data/" + asdf).get()).exists == true) {
             dbService.doc("User Data/" + asdf).get().then((doc) => {
                 if (command == "bal" || command == "balance") {
                     const ddd = new MessageEmbed()
@@ -884,7 +967,7 @@ Bank: ${doc.data().bank}
                         } else {
                             if (asdf != client.user.id) {
                                 if (asdf != message.author.id) {
-                                    message.channel.send(`@${message.author.username} gave all of his money to @${message.mentions.users.first().username}`)
+                                    message.channel.send(`${message.author.username} gave all of his money to ${message.mentions.users.first().username}`)
                                         dbService.doc(`User Data/${message.mentions.users.first().id}`).set({
                                             wallet: doc.data().wallet + meme.data().wallet,
                                             bank: doc.data().bank
@@ -899,15 +982,45 @@ Bank: ${doc.data().bank}
                             } else {
                                 message.reply("I don't need your dirty money");
                             }
-                            }
+                        }
                     } else {
                         message.reply("Say how much money by a number or all")
                     }
-                }})
-
-        } else {
-            message.reply("Cannot find a user with id: " + message.author.id)
-        }
+                } else if (command == "rob") {
+                    if (args[1]) {
+                        if (message.mentions.users.first().id !== message.author.id) {
+                            if (message.mentions.users.first().id !== client.user.id) {
+                                rob.add(message.author.id);
+                                message.reply({"content": `${message.author.username}, you have 50% chance of dying, 30% chance of stealing 10% of ${message.mentions.users.first().username}'s money, 15% chance of stealing half of ${message.mentions.users.first().username}'s money, and 5% chance of stealing everything ${message.mentions.users.first().username} owns. Do you still wish to continue?`, "components": [
+                                    {
+                                        "type": 1,
+                                        "components": [
+                                            {
+                                                "type": 2,
+                                                "label": "Yes",
+                                                "style": "SUCCESS",
+                                                "customId": "rob__yes"
+                                            },
+                                            {
+                                                "type": 2,
+                                                "label": "No",
+                                                "style": "DANGER",
+                                                "customId": "rob__no"
+                                            }
+                                        ]
+                                    }
+                                ]});
+                            } else {
+                                message.reply("I was thinking you would be smart enough not to know that you can't rob a bot, but this proves me wrong")
+                            }
+                        } else {
+                            message.reply("Why tf are you trying to rob yourself")
+                        }
+                    } else {
+                        message.reply("Please specify who you're robbing")
+                    }
+                }
+            })
         }
     }
 	});
