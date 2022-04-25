@@ -10,6 +10,13 @@ const rob = new Set();
 
 const dbService = fb;
 
+const { MongoClient } = require("mongodb");
+const uri = "mongodb+srv://wooyong:0405@economy-bot.uw8vl.mongodb.net/economyBot?retryWrites=true&w=majority";
+const clienta = new MongoClient(uri);
+const market = dbService.collection(`Stock Market`);
+const database = clienta.db("economyBot");
+const stock = database.collection("stock market");
+
 function death(id) {
     dbService.doc(`User Data/${id}`).set({
         wallet: 0,
@@ -21,92 +28,89 @@ function death(id) {
     }, 60000)
 }
 
-function change(id) {
-    const market = dbService.collection(`Stock Market`)
+async function change(id) {
+    const value = await stock.distinct("value", {name: id})
     market.doc(`bought`).get().then((bought) => {
         market.doc(`sold`).get().then((sold) => {
-            market.doc(`value`).get().then((value) => {
-                if (id == "we") {
-                    if (bought.data().we > sold.data().we) {
-                        market.doc(`value`).update({
-                            we: value.data().we + 10
-                        })
-                    } else if (bought.data().we < sold.data().we) {
-                        market.doc(`value`).update({
-                            we: Math.abs(value.data().we - 10)
-                        })
-                    }
-                } else if (id == "he") {
-                    if (bought.data().he > sold.data().he) {
-                        market.doc(`value`).update({
-                            he: value.data().he + 10
-                        })
-                    } else if (bought.data().we < sold.data().we) {
-                        market.doc(`value`).update({
-                            he: Math.abs(value.data().he - 10)
-                        })
-                    }
-                } else if (id == "hs") {
-                    if (bought.data().hs > sold.data().hs) {
-                        market.doc(`value`).update({
-                            hs: value.data().hs + 10
-                        })
-                    } else if (bought.data().hs < sold.data().hs) {
-                        market.doc(`value`).update({
-                            hs: Math.abs(value.data().hs - 10)
-                        })
-                    }
-                } else if (id == "tb") {
-                    if (bought.data().tb > sold.data().tb) {
-                        market.doc(`value`).update({
-                            tb: value.data().tb + 10
-                        })
-                    } else if (bought.data().tb < sold.data().tb) {
-                        market.doc(`value`).update({
-                            tb: Math.abs(value.data().tb - 10)
-                        })
-                    }
-                } else if (id == "jm") {
-                    if (bought.data().jm > sold.data().jm) {
-                        market.doc(`value`).update({
-                            jm: value.data().jm + 10
-                        })
-                    } else if (bought.data().jm < sold.data().jm) {
-                        market.doc(`value`).update({
-                            jm: Math.abs(value.data().jm - 10)
-                        })
-                    }
+            if (id == "jm") {
+                if (bought.data().jm > sold.data().jm) {
+                    stock.updateOne({name: id}, {$set: {value: Math.abs(value[0] + 100)}})
+                } else if (bought.data().jm < sold.data().jm) {
+                    stock.updateOne({name: id}, {$set: {value: Math.abs(value[0] - 100)}})
                 }
-            })
+                market.doc(`bought`).update({
+                    jm: 0,
+                })
+                market.doc(`sold`).update({
+                    jm: 0,
+                })
+            } else if (id == "we") {
+                if (bought.data().we > sold.data().we) {
+                    stock.updateOne({name: id}, {$set: {value: Math.abs(value[0] + 100)}})
+                } else if (bought.data().jm < sold.data().jm) {
+                    stock.updateOne({name: id}, {$set: {value: Math.abs(value[0] - 100)}})
+                }
+                market.doc(`bought`).update({
+                    we: 0,
+                })
+                market.doc(`sold`).update({
+                    we: 0,
+                })
+            } else if (id == "he") {
+                if (bought.data().he > sold.data().he) {
+                    stock.updateOne({name: id}, {$set: {value: Math.abs(value[0] + 100)}})
+                } else if (bought.data().jm < sold.data().jm) {
+                    stock.updateOne({name: id}, {$set: {value: Math.abs(value[0] - 100)}})
+                }
+                market.doc(`bought`).update({
+                    he: 0,
+                })
+                market.doc(`sold`).update({
+                    he: 0,
+                })
+            } else if (id == "hs") {
+                if (bought.data().hs > sold.data().hs) {
+                    stock.updateOne({name: id}, {$set: {value: Math.abs(value[0] + 100)}})
+                } else if (bought.data().jm < sold.data().jm) {
+                    stock.updateOne({name: id}, {$set: {value: Math.abs(value[0] - 100)}})
+                }
+                market.doc(`bought`).update({
+                    hs: 0,
+                })
+                market.doc(`sold`).update({
+                    hs: 0,
+                })
+            } else if (id == "tb") {
+                if (bought.data().tb > sold.data().tb) {
+                    stock.updateOne({name: id}, {$set: {value: Math.abs(value[0] + 100)}})
+                } else if (bought.data().jm < sold.data().jm) {
+                    stock.updateOne({name: id}, {$set: {value: Math.abs(value[0] - 100)}})
+                }
+                market.doc(`bought`).update({
+                    tb: 0,
+                })
+                market.doc(`sold`).update({
+                    tb: 0,
+                })
+            }
         })
     })
 }
 
-function sChange(id) {
+async function sChange(id) {
     const change = Math.round(Math.random()*16)
-    dbService.doc(`Stock Market/value`).get().then((value) => {
-        if (id == "jm") {
-            dbService.doc(`Stock Market/value`).update({
-                jm: Math.abs(value.data().jm + change - 8)
-            })
-        } else if (id == "we") {
-            dbService.doc(`Stock Market/value`).update({
-                we: Math.abs(value.data().we + change - 8)
-            })
-        } else if (id == "he") {
-            dbService.doc(`Stock Market/value`).update({
-                he: Math.abs(value.data().he + change - 8)
-            })
-        } else if (id == "hs") {
-            dbService.doc(`Stock Market/value`).update({
-                hs: Math.abs(value.data().hs + change - 8)
-            })
-        } else if (id == "tb") {
-            dbService.doc(`Stock Market/value`).update({
-                tb: Math.abs(value.data().tb + change - 8)
-            })
-        }
-    })
+    const value = await stock.distinct("value", {name: id})
+    if (id == "jm") {
+        stock.updateOne({name: id}, {$set: {value: Math.abs(value[0] + change - 8)}})
+    } else if (id == "we") {
+        stock.updateOne({name: id}, {$set: {value: Math.abs(value[0] + change - 8)}})
+    } else if (id == "he") {
+        stock.updateOne({name: id}, {$set: {value: Math.abs(value[0] + change - 8)}})
+    } else if (id == "hs") {
+        stock.updateOne({name: id}, {$set: {value: Math.abs(value[0] + change - 8)}})
+    } else if (id == "tb") {
+        stock.updateOne({name: id}, {$set: {value: Math.abs(value[0] + change - 8)}})
+    }
 }
 
 function allChange() {
@@ -116,7 +120,7 @@ function allChange() {
         change("hs");
         change("he");
         change("we");
-    }, 3600000)
+    }, 60000)
     setInterval(() => {
         sChange("tb");
         sChange("jm");
@@ -128,7 +132,10 @@ function allChange() {
 
 client.once("ready", () => {
 	console.log(`Logged in as ${client.user.tag}`);
-    allChange()
+    clienta.connect().then(() => {
+        console.log("Database Initialized")
+        allChange()
+    });
 });
 
 client.on("interactionCreate", async (ia) => {
@@ -440,6 +447,8 @@ client.on("interactionCreate", async (ia) => {
 })
 
 client.on("messageCreate", async (message) => {
+    const database = clienta.db("economyBot");
+    const stock = database.collection("stock market")
     let meme = await dbService.doc(`User Data/${message.author.id}`).get();
     if (!meme.exists) {
         dbService.doc(`User Data/${message.author.id}`).set({
@@ -1021,399 +1030,396 @@ You lost all your money
         } else if (command == "rob") {
             message.reply("You need to say who you're robbing")
         } else if (command == "sm") {
-            dbService.doc("Stock Market/value").get().then((doc) => {
-                if (args[1] == "buy" || args[1] == "sell") {
-                    if (args[2] == "we" || args[2] == "he" || args[2] == "tb" || args[2] == "jm" || args[2] == "hs") {
-                        if (parseInt(args[3]) || args[3] == "max") {
-                            dbService.doc(`User Data/${message.author.id}`).get().then((doca) => {
-                                dbService.doc(`Stock Market/${message.author.id}`).get().then((holder) => {
-                                    dbService.doc(`Stock Market/${message.author.id}`).get().then((holder) => { 
-                                        dbService.doc(`Stock Market/bought`).get().then((bought) => { 
-                                            dbService.doc(`Stock Market/sold`).get().then((sold) => { 
-                                                if (args[2] == "we") {
-                                                    if (parseInt(args[3])) {
-                                                        const price = doc.data().we * parseInt(args[3])
-                                                        if (args[1] == "buy") {
-                                                            if (price <= doca.data().wallet) {
-                                                                dbService.doc(`User Data/${message.author.id}`).set({
-                                                                    wallet: doca.data().wallet - price,
-                                                                    bank: doca.data().bank
-                                                                })
-                                                                dbService.doc(`Stock Market/${message.author.id}`).update({
-                                                                    we: holder.data().we + parseInt(args[3])
-                                                                })
-                                                                dbService.doc(`Stock Market/bought`).update({
-                                                                    we: bought.data().we + parseInt(args[3])
-                                                                })
-                                                                message.channel.send(`${message.author.username} bought ${args[3]} ${args[2]} stocks at ${doc.data().we}`)
-                                                            } else {
-                                                                message.channel.send("You don't have that much money")
-                                                            }
-                                                        } else if (args[1] == "sell") {
-                                                            if (parseInt(args[3]) <= holder.data().we) {
-                                                                dbService.doc(`User Data/${message.author.id}`).set({
-                                                                    wallet: doca.data().wallet + price,
-                                                                    bank: doca.data().bank
-                                                                })
-                                                                dbService.doc(`Stock Market/${message.author.id}`).update({
-                                                                    we: holder.data().we - parseInt(args[3])
-                                                                })
-                                                                dbService.doc(`Stock Market/sold`).update({
-                                                                    we: sold.data().we + parseInt(args[3])
-                                                                })
-                                                                message.channel.send(`${message.author.username} sold ${args[3]} ${args[2]} stocks at ${doc.data().we}`)
-                                                            } else {
-                                                                message.channel.send("You have to have it if you want to sell it")
-                                                            }
-                                                        }
-                                                    } else if (args[3] == "max") {
-                                                        if (args[1] == "buy") {
-                                                            const possible = Math.floor(doca.data().wallet/doc.data().we);
-                                                            const price = doc.data().we*possible;
-                                                            dbService.doc(`User Data/${message.author.id}`).set({
-                                                                wallet: doca.data().wallet - price,
-                                                                bank: doca.data().bank
-                                                            })
-                                                            dbService.doc(`Stock Market/${message.author.id}`).update({
-                                                                we: holder.data().we + possible
-                                                            })
-                                                            dbService.doc(`Stock Market/bought`).update({
-                                                                we: bought.data().we + possible
-                                                            })
-                                                            message.channel.send(`${message.author.username} bought ${possible} ${args[2]} stocks at ${doc.data().we}`)
-                                                        } else if (args[1] == "sell") {
-                                                            const price = doc.data().we*holder.data().we;
-                                                            const possible = holder.data().we
-                                                            dbService.doc(`Stock Market/sold`).update({
-                                                                we: sold.data().we + holder.data().we
-                                                            })
-                                                            dbService.doc(`User Data/${message.author.id}`).set({
-                                                                wallet: doca.data().wallet + price,
-                                                                bank: doca.data().bank
-                                                            })
-                                                            dbService.doc(`Stock Market/${message.author.id}`).update({
-                                                                we: 0
-                                                            })
-                                                            message.channel.send(`${message.author.username} sold ${possible} ${args[2]} stocks at ${doc.data().we}`)
-                                                        }
+            if (args[1] == "buy" || args[1] == "sell") {
+                if (args[2] == "we" || args[2] == "he" || args[2] == "tb" || args[2] == "jm" || args[2] == "hs") {
+                    if (parseInt(args[3]) || args[3] == "max") {
+                        const value = await stock.distinct("value", {name: args[2]})
+                        dbService.doc(`User Data/${message.author.id}`).get().then((doca) => {
+                            dbService.doc(`Stock Market/${message.author.id}`).get().then((holder) => { 
+                                dbService.doc(`Stock Market/bought`).get().then((bought) => { 
+                                    dbService.doc(`Stock Market/sold`).get().then((sold) => {
+                                        if (args[2] == "we") {
+                                            if (parseInt(args[3])) {
+                                                const price = value[0] * parseInt(args[3])
+                                                if (args[1] == "buy") {
+                                                    if (price <= doca.data().wallet) {
+                                                        dbService.doc(`User Data/${message.author.id}`).set({
+                                                            wallet: doca.data().wallet - price,
+                                                            bank: doca.data().bank
+                                                        })
+                                                        dbService.doc(`Stock Market/${message.author.id}`).update({
+                                                            we: holder.data().we + parseInt(args[3])
+                                                        })
+                                                        dbService.doc(`Stock Market/bought`).update({
+                                                            we: bought.data().we + parseInt(args[3])
+                                                        })
+                                                        message.channel.send(`${message.author.username} bought ${args[3]} ${args[2]} stocks at ${value[0]}`)
+                                                    } else {
+                                                        message.channel.send("You don't have that much money")
                                                     }
-                                                } else if (args[2] == "he") {
-                                                    if (parseInt(args[3])) {
-                                                        const price = doc.data().he * parseInt(args[3])
-                                                        if (args[1] == "buy") {
-                                                            if (doc.data().he * parseInt(args[3]) <= doca.data().wallet) {
-                                                                dbService.doc(`User Data/${message.author.id}`).set({
-                                                                    wallet: doca.data().wallet - price,
-                                                                    bank: doca.data().bank
-                                                                })
-                                                                dbService.doc(`Stock Market/${message.author.id}`).update({
-                                                                    he: holder.data().he + parseInt(args[3])
-                                                                })
-                                                                dbService.doc(`Stock Market/bought`).update({
-                                                                    he: bought.data().he + parseInt(args[3])
-                                                                })
-                                                                message.channel.send(`${message.author.username} bought ${args[3]} ${args[2]} stocks at ${doc.data().he}`)
-                                                            } else {
-                                                                message.channel.send("You don't have that much money")
-                                                            }
-                                                        } else if (args[1] == "sell") {
-                                                            if (parseInt(args[3]) <= holder.data().he) {
-                                                                dbService.doc(`User Data/${message.author.id}`).set({
-                                                                    wallet: doca.data().wallet + price,
-                                                                    bank: doca.data().bank
-                                                                })
-                                                                dbService.doc(`Stock Market/${message.author.id}`).update({
-                                                                    he: holder.data().he - parseInt(args[3])
-                                                                })
-                                                                dbService.doc(`Stock Market/sold`).update({
-                                                                    he: sold.data().he + parseInt(args[3])
-                                                                })
-                                                                message.channel.send(`${message.author.username} sold ${args[3]} ${args[2]} stocks at ${doc.data().he}`)
-                                                            } else {
-                                                                message.channel.send("You have to have it if you want to sell it")
-                                                            }
-                                                        }
-                                                    } else if (args[3] == "max") {
-                                                        if (args[1] == "buy") {
-                                                            const possible = Math.floor(doca.data().wallet/doc.data().he);
-                                                            const price = doc.data().he*possible;
-                                                            dbService.doc(`User Data/${message.author.id}`).set({
-                                                                wallet: doca.data().wallet - price,
-                                                                bank: doca.data().bank
-                                                            })
-                                                            dbService.doc(`Stock Market/${message.author.id}`).update({
-                                                                he: holder.data().he + possible
-                                                            })
-                                                            dbService.doc(`Stock Market/bought`).update({
-                                                                he: bought.data().he + possible
-                                                            })
-                                                            message.channel.send(`${message.author.username} bought ${possible} ${args[2]} stocks at ${doc.data().he}`)
-                                                        } else if (args[1] == "sell") {
-                                                            const price = doc.data().he*holder.data().he;
-                                                            const possible = holder.data().we
-                                                            dbService.doc(`Stock Market/sold`).update({
-                                                                he: sold.data().he + holder.data().he
-                                                            })
-                                                            dbService.doc(`User Data/${message.author.id}`).set({
-                                                                wallet: doca.data().wallet + price,
-                                                                bank: doca.data().bank
-                                                            })
-                                                            dbService.doc(`Stock Market/${message.author.id}`).update({
-                                                                he: 0
-                                                            })
-                                                            message.channel.send(`${message.author.username} sold ${possible} ${args[2]} stocks at ${doc.data().he}`)
-                                                        }
-                                                    }
-                                                } else if (args[2] == "tb") {
-                                                    if (parseInt(args[3])) {
-                                                        const price = doc.data().tb * parseInt(args[3])
-                                                        if (args[1] == "buy") {
-                                                            if (doc.data().tb * parseInt(args[3]) <= doca.data().wallet) {
-                                                                dbService.doc(`User Data/${message.author.id}`).set({
-                                                                    wallet: doca.data().wallet - price,
-                                                                    bank: doca.data().bank
-                                                                })
-                                                                dbService.doc(`Stock Market/${message.author.id}`).update({
-                                                                    tb: holder.data().tb + parseInt(args[3])
-                                                                })
-                                                                dbService.doc(`Stock Market/bought`).update({
-                                                                    tb: bought.data().tb + parseInt(args[3])
-                                                                })
-                                                                message.channel.send(`${message.author.username} bought ${args[3]} ${args[2]} stocks at ${doc.data().tb}`)
-                                                            } else {
-                                                                message.channel.send("You don't have that much money")
-                                                            }
-                                                        } else if (args[1] == "sell") {
-                                                            if (parseInt(args[3]) <= holder.data().tb) {
-                                                                dbService.doc(`User Data/${message.author.id}`).set({
-                                                                    wallet: doca.data().wallet + price,
-                                                                    bank: doca.data().bank
-                                                                })
-                                                                dbService.doc(`Stock Market/${message.author.id}`).update({
-                                                                    tb: holder.data().tb - parseInt(args[3])
-                                                                })
-                                                                dbService.doc(`Stock Market/sold`).update({
-                                                                    tb: sold.data().tb + parseInt(args[3])
-                                                                })
-                                                                message.channel.send(`${message.author.username} sold ${args[3]} ${args[2]} stocks at ${doc.data().tb}`)
-                                                            } else {
-                                                                message.channel.send("You have to have it if you want to sell it")
-                                                            }
-                                                        }
-                                                    } else if (args[3] == "max") {
-                                                        if (args[1] == "buy") {
-                                                            const possible = Math.floor(doca.data().wallet/doc.data().tb);
-                                                            const price = doc.data().tb*possible;
-                                                            dbService.doc(`User Data/${message.author.id}`).set({
-                                                                wallet: doca.data().wallet - price,
-                                                                bank: doca.data().bank
-                                                            })
-                                                            dbService.doc(`Stock Market/${message.author.id}`).update({
-                                                                tb: holder.data().tb + possible
-                                                            })
-                                                            dbService.doc(`Stock Market/bought`).update({
-                                                                tb: bought.data().tb + possible
-                                                            })
-                                                            message.channel.send(`${message.author.username} bought ${possible} ${args[2]} stocks at ${doc.data().tb}`)
-                                                        } else if (args[1] == "sell") {
-                                                            const price = doc.data().tb*holder.data().tb;
-                                                            const possible = holder.data().we
-                                                            dbService.doc(`Stock Market/sold`).update({
-                                                                tb: sold.data().tb + holder.data().tb
-                                                            })
-                                                            dbService.doc(`User Data/${message.author.id}`).set({
-                                                                wallet: doca.data().wallet + price,
-                                                                bank: doca.data().bank
-                                                            })
-                                                            dbService.doc(`Stock Market/${message.author.id}`).update({
-                                                                tb: 0
-                                                            })
-                                                            message.channel.send(`${message.author.username} sold ${possible} ${args[2]} stocks at ${doc.data().tb}`)
-                                                        }
-                                                    }
-                                                } else if (args[2] == "jm") {
-                                                    if (parseInt(args[3])) {
-                                                        const price = doc.data().jm * parseInt(args[3])
-                                                        if (args[1] == "buy") {
-                                                            if (doc.data().jm * parseInt(args[3]) <= doca.data().wallet) {
-                                                                dbService.doc(`User Data/${message.author.id}`).set({
-                                                                    wallet: doca.data().wallet - price,
-                                                                    bank: doca.data().bank
-                                                                })
-                                                                dbService.doc(`Stock Market/${message.author.id}`).update({
-                                                                    jm: holder.data().jm + parseInt(args[3])
-                                                                })
-                                                                dbService.doc(`Stock Market/bought`).update({
-                                                                    jm: bought.data().jm + parseInt(args[3])
-                                                                })
-                                                                message.channel.send(`${message.author.username} bought ${args[3]} ${args[2]} stocks at ${doc.data().jm}`)
-                                                            } else {
-                                                                message.channel.send("You don't have that much money")
-                                                            }
-                                                        } else if (args[1] == "sell") {
-                                                            if (parseInt(args[3]) <= holder.data().jm) {
-                                                                dbService.doc(`User Data/${message.author.id}`).set({
-                                                                    wallet: doca.data().wallet + price,
-                                                                    bank: doca.data().bank
-                                                                })
-                                                                dbService.doc(`Stock Market/${message.author.id}`).update({
-                                                                    jm: holder.data().jm - parseInt(args[3])
-                                                                })
-                                                                dbService.doc(`Stock Market/sold`).update({
-                                                                    jm: sold.data().jm + parseInt(args[3])
-                                                                })
-                                                                message.channel.send(`${message.author.username} sold ${args[3]} ${args[2]} stocks at ${doc.data().jm}`)
-                                                            } else {
-                                                                message.channel.send("You have to have it if you want to sell it")
-                                                            }
-                                                        }
-                                                    } else if (args[3] == "max") {
-                                                        if (args[1] == "buy") {
-                                                            const possible = Math.floor(doca.data().wallet/doc.data().jm);
-                                                            const price = doc.data().jm*possible;
-                                                            dbService.doc(`User Data/${message.author.id}`).set({
-                                                                wallet: doca.data().wallet - price,
-                                                                bank: doca.data().bank
-                                                            })
-                                                            dbService.doc(`Stock Market/${message.author.id}`).update({
-                                                                jm: holder.data().jm + possible
-                                                            })
-                                                            dbService.doc(`Stock Market/bought`).update({
-                                                                jm: bought.data().jm + possible
-                                                            })
-                                                            message.channel.send(`${message.author.username} bought ${possible} ${args[2]} stocks at ${doc.data().jm}`)
-                                                        } else if (args[1] == "sell") {
-                                                            const price = doc.data().jm*holder.data().jm;
-                                                            const possible = holder.data().we
-                                                            dbService.doc(`Stock Market/sold`).update({
-                                                                jm: sold.data().jm + holder.data().jm
-                                                            })
-                                                            dbService.doc(`User Data/${message.author.id}`).set({
-                                                                wallet: doca.data().wallet + price,
-                                                                bank: doca.data().bank
-                                                            })
-                                                            dbService.doc(`Stock Market/${message.author.id}`).update({
-                                                                jm: 0
-                                                            })
-                                                            message.channel.send(`${message.author.username} sold ${possible} ${args[2]} stocks at ${doc.data().jm}`)
-                                                        }
-                                                    }
-                                                } else {
-                                                    if (parseInt(args[3])) {
-                                                        const price = doc.data().hs * parseInt(args[3])
-                                                        if (args[1] == "buy") {
-                                                            if (doc.data().hs * parseInt(args[3]) <= doca.data().wallet) {
-                                                                dbService.doc(`User Data/${message.author.id}`).set({
-                                                                    wallet: doca.data().wallet - price,
-                                                                    bank: doca.data().bank
-                                                                })
-                                                                dbService.doc(`Stock Market/${message.author.id}`).update({
-                                                                    hs: holder.data().hs + parseInt(args[3])
-                                                                })
-                                                                dbService.doc(`Stock Market/bought`).update({
-                                                                    hs: bought.data().hs + parseInt(args[3])
-                                                                })
-                                                                message.channel.send(`${message.author.username} bought ${args[3]} ${args[2]} stocks at ${doc.data().hs}`)
-                                                            } else {
-                                                                message.channel.send("You don't have that much money")
-                                                            }
-                                                        } else if (args[1] == "sell") {
-                                                            if (parseInt(args[3]) <= holder.data().hs) {
-                                                                dbService.doc(`User Data/${message.author.id}`).set({
-                                                                    wallet: doca.data().wallet + price,
-                                                                    bank: doca.data().bank
-                                                                })
-                                                                dbService.doc(`Stock Market/${message.author.id}`).update({
-                                                                    hs: holder.data().hs - parseInt(args[3])
-                                                                })
-                                                                dbService.doc(`Stock Market/sold`).update({
-                                                                    hs: sold.data().hs + parseInt(args[3])
-                                                                })
-                                                                message.channel.send(`${message.author.username} sold ${args[3]} ${args[2]} stocks at ${doc.data().hs}`)
-                                                            } else {
-                                                                message.channel.send("You have to have it if you want to sell it")
-                                                            }
-                                                        }
-                                                    } else if (args[3] == "max") {
-                                                        if (args[1] == "buy") {
-                                                            const possible = Math.floor(doca.data().wallet/doc.data().hs);
-                                                            const price = doc.data().hs*possible;
-                                                            dbService.doc(`User Data/${message.author.id}`).set({
-                                                                wallet: doca.data().wallet - price,
-                                                                bank: doca.data().bank
-                                                            })
-                                                            dbService.doc(`Stock Market/${message.author.id}`).update({
-                                                                hs: holder.data().hs + possible
-                                                            })
-                                                            dbService.doc(`Stock Market/bought`).update({
-                                                                hs: bought.data().hs + possible
-                                                            })
-                                                            message.channel.send(`${message.author.username} bought ${possible} ${args[2]} stocks at ${doc.data().hs}`)
-                                                        } else if (args[1] == "sell") {
-                                                            const price = doc.data().hs*holder.data().hs;
-                                                            const possible = holder.data().we
-                                                            dbService.doc(`Stock Market/sold`).update({
-                                                                hs: sold.data().hs + holder.data().hs
-                                                            })
-                                                            dbService.doc(`User Data/${message.author.id}`).set({
-                                                                wallet: doca.data().wallet + price,
-                                                                bank: doca.data().bank
-                                                            })
-                                                            dbService.doc(`Stock Market/${message.author.id}`).update({
-                                                                hs: 0
-                                                            })
-                                                            message.channel.send(`${message.author.username} sold ${possible} ${args[2]} stocks at ${doc.data().hs}`)
-                                                        }
+                                                } else if (args[1] == "sell") {
+                                                    if (parseInt(args[3]) <= holder.data().we) {
+                                                        dbService.doc(`User Data/${message.author.id}`).set({
+                                                            wallet: doca.data().wallet + price,
+                                                            bank: doca.data().bank
+                                                        })
+                                                        dbService.doc(`Stock Market/${message.author.id}`).update({
+                                                            we: holder.data().we - parseInt(args[3])
+                                                        })
+                                                        dbService.doc(`Stock Market/sold`).update({
+                                                            we: sold.data().we + parseInt(args[3])
+                                                        })
+                                                        message.channel.send(`${message.author.username} sold ${args[3]} ${args[2]} stocks at ${value[0]}`)
+                                                    } else {
+                                                        message.channel.send("You have to have it if you want to sell it")
                                                     }
                                                 }
-                                            }) 
-                                        }) 
-                                    })
-                                })
+                                            } else if (args[3] == "max") {
+                                                if (args[1] == "buy") {
+                                                    const possible = Math.floor(doca.data().wallet/value[0]);
+                                                    const price = value[0]*possible;
+                                                    dbService.doc(`User Data/${message.author.id}`).set({
+                                                        wallet: doca.data().wallet - price,
+                                                        bank: doca.data().bank
+                                                    })
+                                                    dbService.doc(`Stock Market/${message.author.id}`).update({
+                                                        we: holder.data().we + possible
+                                                    })
+                                                    dbService.doc(`Stock Market/bought`).update({
+                                                        we: bought.data().we + possible
+                                                    })
+                                                    message.channel.send(`${message.author.username} bought ${possible} ${args[2]} stocks at ${value[0]}`)
+                                                } else if (args[1] == "sell") {
+                                                    const price = value[0]*holder.data().we;
+                                                    const possible = holder.data().we
+                                                    dbService.doc(`Stock Market/sold`).update({
+                                                        we: sold.data().we + holder.data().we
+                                                    })
+                                                    dbService.doc(`User Data/${message.author.id}`).set({
+                                                        wallet: doca.data().wallet + price,
+                                                        bank: doca.data().bank
+                                                    })
+                                                    message.channel.send(`${message.author.username} sold ${possible} ${args[2]} stocks at ${value[0]}`)
+                                                    dbService.doc(`Stock Market/${message.author.id}`).update({
+                                                        we: 0
+                                                    })
+                                                }
+                                            }
+                                        } else if (args[2] == "he") {
+                                            if (parseInt(args[3])) {
+                                                const price = value[0] * parseInt(args[3])
+                                                if (args[1] == "buy") {
+                                                    if (value[0] * parseInt(args[3]) <= doca.data().wallet) {
+                                                        dbService.doc(`User Data/${message.author.id}`).set({
+                                                            wallet: doca.data().wallet - price,
+                                                            bank: doca.data().bank
+                                                        })
+                                                        dbService.doc(`Stock Market/${message.author.id}`).update({
+                                                            he: holder.data().he + parseInt(args[3])
+                                                        })
+                                                        dbService.doc(`Stock Market/bought`).update({
+                                                            he: bought.data().he + parseInt(args[3])
+                                                        })
+                                                        message.channel.send(`${message.author.username} bought ${args[3]} ${args[2]} stocks at ${value[0]}`)
+                                                    } else {
+                                                        message.channel.send("You don't have that much money")
+                                                    }
+                                                } else if (args[1] == "sell") {
+                                                    if (parseInt(args[3]) <= holder.data().he) {
+                                                        dbService.doc(`User Data/${message.author.id}`).set({
+                                                            wallet: doca.data().wallet + price,
+                                                            bank: doca.data().bank
+                                                        })
+                                                        dbService.doc(`Stock Market/${message.author.id}`).update({
+                                                            he: holder.data().he - parseInt(args[3])
+                                                        })
+                                                        dbService.doc(`Stock Market/sold`).update({
+                                                            he: sold.data().he + parseInt(args[3])
+                                                        })
+                                                        message.channel.send(`${message.author.username} sold ${args[3]} ${args[2]} stocks at ${value[0]}`)
+                                                    } else {
+                                                        message.channel.send("You have to have it if you want to sell it")
+                                                    }
+                                                }
+                                            } else if (args[3] == "max") {
+                                                if (args[1] == "buy") {
+                                                    const possible = Math.floor(doca.data().wallet/value[0]);
+                                                    const price = value[0]*possible;
+                                                    dbService.doc(`User Data/${message.author.id}`).set({
+                                                        wallet: doca.data().wallet - price,
+                                                        bank: doca.data().bank
+                                                    })
+                                                    dbService.doc(`Stock Market/${message.author.id}`).update({
+                                                        he: holder.data().he + possible
+                                                    })
+                                                    dbService.doc(`Stock Market/bought`).update({
+                                                        he: bought.data().he + possible
+                                                    })
+                                                    message.channel.send(`${message.author.username} bought ${possible} ${args[2]} stocks at ${value[0]}`)
+                                                } else if (args[1] == "sell") {
+                                                    const price = value[0]*holder.data().he;
+                                                    const possible = holder.data().we
+                                                    dbService.doc(`Stock Market/sold`).update({
+                                                        he: sold.data().he + holder.data().he
+                                                    })
+                                                    dbService.doc(`User Data/${message.author.id}`).set({
+                                                        wallet: doca.data().wallet + price,
+                                                        bank: doca.data().bank
+                                                    })
+                                                    message.channel.send(`${message.author.username} sold ${possible} ${args[2]} stocks at ${value[0]}`)
+                                                    dbService.doc(`Stock Market/${message.author.id}`).update({
+                                                        he: 0
+                                                    })
+                                                }
+                                            }
+                                        } else if (args[2] == "tb") {
+                                            if (parseInt(args[3])) {
+                                                const price = value[0] * parseInt(args[3])
+                                                if (args[1] == "buy") {
+                                                    if (value[0] * parseInt(args[3]) <= doca.data().wallet) {
+                                                        dbService.doc(`User Data/${message.author.id}`).set({
+                                                            wallet: doca.data().wallet - price,
+                                                            bank: doca.data().bank
+                                                        })
+                                                        dbService.doc(`Stock Market/${message.author.id}`).update({
+                                                            tb: holder.data().tb + parseInt(args[3])
+                                                        })
+                                                        dbService.doc(`Stock Market/bought`).update({
+                                                            tb: bought.data().tb + parseInt(args[3])
+                                                        })
+                                                        message.channel.send(`${message.author.username} bought ${args[3]} ${args[2]} stocks at ${value[0]}`)
+                                                    } else {
+                                                        message.channel.send("You don't have that much money")
+                                                    }
+                                                } else if (args[1] == "sell") {
+                                                    if (parseInt(args[3]) <= holder.data().tb) {
+                                                        dbService.doc(`User Data/${message.author.id}`).set({
+                                                            wallet: doca.data().wallet + price,
+                                                            bank: doca.data().bank
+                                                        })
+                                                        dbService.doc(`Stock Market/${message.author.id}`).update({
+                                                            tb: holder.data().tb - parseInt(args[3])
+                                                        })
+                                                        dbService.doc(`Stock Market/sold`).update({
+                                                            tb: sold.data().tb + parseInt(args[3])
+                                                        })
+                                                        message.channel.send(`${message.author.username} sold ${args[3]} ${args[2]} stocks at ${value[0]}`)
+                                                    } else {
+                                                        message.channel.send("You have to have it if you want to sell it")
+                                                    }
+                                                }
+                                            } else if (args[3] == "max") {
+                                                if (args[1] == "buy") {
+                                                    const possible = Math.floor(doca.data().wallet/value[0]);
+                                                    const price = value[0]*possible;
+                                                    dbService.doc(`User Data/${message.author.id}`).set({
+                                                        wallet: doca.data().wallet - price,
+                                                        bank: doca.data().bank
+                                                    })
+                                                    dbService.doc(`Stock Market/${message.author.id}`).update({
+                                                        tb: holder.data().tb + possible
+                                                    })
+                                                    dbService.doc(`Stock Market/bought`).update({
+                                                        tb: bought.data().tb + possible
+                                                    })
+                                                    message.channel.send(`${message.author.username} bought ${possible} ${args[2]} stocks at ${value[0]}`)
+                                                } else if (args[1] == "sell") {
+                                                    const price = value[0]*holder.data().tb;
+                                                    const possible = holder.data().we
+                                                    dbService.doc(`Stock Market/sold`).update({
+                                                        tb: sold.data().tb + holder.data().tb
+                                                    })
+                                                    dbService.doc(`User Data/${message.author.id}`).set({
+                                                        wallet: doca.data().wallet + price,
+                                                        bank: doca.data().bank
+                                                    })
+                                                    message.channel.send(`${message.author.username} sold ${possible} ${args[2]} stocks at ${value[0]}`)
+                                                    dbService.doc(`Stock Market/${message.author.id}`).update({
+                                                        tb: 0
+                                                    })
+                                                }
+                                            }
+                                        } else if (args[2] == "jm") {
+                                            if (parseInt(args[3])) {
+                                                const price = value[0] * parseInt(args[3])
+                                                if (args[1] == "buy") {
+                                                    if (value[0] * parseInt(args[3]) <= doca.data().wallet) {
+                                                        dbService.doc(`User Data/${message.author.id}`).set({
+                                                            wallet: doca.data().wallet - price,
+                                                            bank: doca.data().bank
+                                                        })
+                                                        dbService.doc(`Stock Market/${message.author.id}`).update({
+                                                            jm: holder.data().jm + parseInt(args[3])
+                                                        })
+                                                        dbService.doc(`Stock Market/bought`).update({
+                                                            jm: bought.data().jm + parseInt(args[3])
+                                                        })
+                                                        message.channel.send(`${message.author.username} bought ${args[3]} ${args[2]} stocks at ${value[0]}`)
+                                                    } else {
+                                                        message.channel.send("You don't have that much money")
+                                                    }
+                                                } else if (args[1] == "sell") {
+                                                    if (parseInt(args[3]) <= holder.data().jm) {
+                                                        dbService.doc(`User Data/${message.author.id}`).set({
+                                                            wallet: doca.data().wallet + price,
+                                                            bank: doca.data().bank
+                                                        })
+                                                        dbService.doc(`Stock Market/${message.author.id}`).update({
+                                                            jm: holder.data().jm - parseInt(args[3])
+                                                        })
+                                                        dbService.doc(`Stock Market/sold`).update({
+                                                            jm: sold.data().jm + parseInt(args[3])
+                                                        })
+                                                        message.channel.send(`${message.author.username} sold ${args[3]} ${args[2]} stocks at ${value[0]}`)
+                                                    } else {
+                                                        message.channel.send("You have to have it if you want to sell it")
+                                                    }
+                                                }
+                                            } else if (args[3] == "max") {
+                                                if (args[1] == "buy") {
+                                                    const possible = Math.floor(doca.data().wallet/value[0]);
+                                                    const price = value[0]*possible;
+                                                    dbService.doc(`User Data/${message.author.id}`).set({
+                                                        wallet: doca.data().wallet - price,
+                                                        bank: doca.data().bank
+                                                    })
+                                                    dbService.doc(`Stock Market/${message.author.id}`).update({
+                                                        jm: holder.data().jm + possible
+                                                    })
+                                                    dbService.doc(`Stock Market/bought`).update({
+                                                        jm: bought.data().jm + possible
+                                                    })
+                                                    message.channel.send(`${message.author.username} bought ${possible} ${args[2]} stocks at ${value[0]}`)
+                                                } else if (args[1] == "sell") {
+                                                    const price = value[0]*holder.data().jm;
+                                                    const possible = holder.data().we
+                                                    dbService.doc(`Stock Market/sold`).update({
+                                                        jm: sold.data().jm + holder.data().jm
+                                                    })
+                                                    dbService.doc(`User Data/${message.author.id}`).set({
+                                                        wallet: doca.data().wallet + price,
+                                                        bank: doca.data().bank
+                                                    })
+                                                    message.channel.send(`${message.author.username} sold ${possible} ${args[2]} stocks at ${value[0]}`)
+                                                    dbService.doc(`Stock Market/${message.author.id}`).update({
+                                                        jm: 0
+                                                    })
+                                                }
+                                            }
+                                        } else {
+                                            if (parseInt(args[3])) {
+                                                const price = value[0] * parseInt(args[3])
+                                                if (args[1] == "buy") {
+                                                    if (value[0] * parseInt(args[3]) <= doca.data().wallet) {
+                                                        dbService.doc(`User Data/${message.author.id}`).set({
+                                                            wallet: doca.data().wallet - price,
+                                                            bank: doca.data().bank
+                                                        })
+                                                        dbService.doc(`Stock Market/${message.author.id}`).update({
+                                                            hs: holder.data().hs + parseInt(args[3])
+                                                        })
+                                                        dbService.doc(`Stock Market/bought`).update({
+                                                            hs: bought.data().hs + parseInt(args[3])
+                                                        })
+                                                        message.channel.send(`${message.author.username} bought ${args[3]} ${args[2]} stocks at ${value[0]}`)
+                                                    } else {
+                                                        message.channel.send("You don't have that much money")
+                                                    }
+                                                } else if (args[1] == "sell") {
+                                                    if (parseInt(args[3]) <= holder.data().hs) {
+                                                        dbService.doc(`User Data/${message.author.id}`).set({
+                                                            wallet: doca.data().wallet + price,
+                                                            bank: doca.data().bank
+                                                        })
+                                                        dbService.doc(`Stock Market/${message.author.id}`).update({
+                                                            hs: holder.data().hs - parseInt(args[3])
+                                                        })
+                                                        dbService.doc(`Stock Market/sold`).update({
+                                                            hs: sold.data().hs + parseInt(args[3])
+                                                        })
+                                                        message.channel.send(`${message.author.username} sold ${args[3]} ${args[2]} stocks at ${value[0]}`)
+                                                    } else {
+                                                        message.channel.send("You have to have it if you want to sell it")
+                                                    }
+                                                }
+                                            } else if (args[3] == "max") {
+                                                if (args[1] == "buy") {
+                                                    const possible = Math.floor(doca.data().wallet/value[0]);
+                                                    const price = value[0]*possible;
+                                                    dbService.doc(`User Data/${message.author.id}`).set({
+                                                        wallet: doca.data().wallet - price,
+                                                        bank: doca.data().bank
+                                                    })
+                                                    dbService.doc(`Stock Market/${message.author.id}`).update({
+                                                        hs: holder.data().hs + possible
+                                                    })
+                                                    dbService.doc(`Stock Market/bought`).update({
+                                                        hs: bought.data().hs + possible
+                                                    })
+                                                    message.channel.send(`${message.author.username} bought ${possible} ${args[2]} stocks at ${value[0]}`)
+                                                } else if (args[1] == "sell") {
+                                                    const price = value[0]*holder.data().hs;
+                                                    const possible = holder.data().we
+                                                    dbService.doc(`Stock Market/sold`).update({
+                                                        hs: sold.data().hs + holder.data().hs
+                                                    })
+                                                    dbService.doc(`User Data/${message.author.id}`).set({
+                                                        wallet: doca.data().wallet + price,
+                                                        bank: doca.data().bank
+                                                    })
+                                                    message.channel.send(`${message.author.username} sold ${possible} ${args[2]} stocks at ${value[0]}`)
+                                                    dbService.doc(`Stock Market/${message.author.id}`).update({
+                                                        hs: 0
+                                                    })
+                                                }
+                                            }
+                                        }
+                                    }) 
+                                }) 
                             })
-                        } else {
-                            message.channel.send("You need to say how many you're buying")
-                        }
+                        })
                     } else {
-                        message.channel.send("Which company's stocks are you trying to buy?")
+                        message.channel.send("You need to say how many you're buying")
                     }
-                } else if (args[1] == "list") {
-                    dbService.doc(`Stock Market/${message.author.id}`).get().then((holder) => {
-                        const embed = new MessageEmbed().setTitle(`${message.author.username}'s Stock Holdings:`) .setDescription(`
-                        **WY Electronics:** ${holder.data().we}
-                        **Harry Entertainment:** ${holder.data().he}
-                        **Taebank:** ${holder.data().tb}
-                        **Jin Medical:** ${holder.data().jm}
-                        **Heidi Information System:** ${holder.data().hs}
-                        `)
-                        message.channel.send({embeds:[embed]})
-                    })
                 } else {
-                    const value = new MessageEmbed().setTitle("Current Stock Values:").setDescription(`
-            **WY Electronics(we):**
-            ${doc.data().we}
-
-            **Harry Entertainment(he):**
-            ${doc.data().he}
-
-            **Taebank(tb):**
-            ${doc.data().tb}
-
-            **Jin Medical(jm):**
-            ${doc.data().jm}
-
-            **Heidi Information System(hs):**
-            ${doc.data().hs}
-
-            <prefix>sm buy <code> <number> to buy
-            <prefix>sm sell <code> <number> to sell
-
-            Ex. -buy jm 10
-            Buying 10 Jin Medical stocks
-                    `).setTimestamp()
-                    message.channel.send({embeds:[value]})
+                    message.channel.send("Which company's stocks are you trying to buy?")
                 }
-            })
+            } else if (args[1] == "list") {
+                dbService.doc(`Stock Market/${message.author.id}`).get().then((holder) => {
+                    const embed = new MessageEmbed().setTitle(`${message.author.username}'s Stock Holdings:`) .setDescription(`
+                    **WY Electronics:** ${holder.data().we}
+                    **Harry Entertainment:** ${holder.data().he}
+                    **Taebank:** ${holder.data().tb}
+                    **Jin Medical:** ${holder.data().jm}
+                    **Jade Information System:** ${holder.data().hs}
+                    `)
+                    message.channel.send({embeds:[embed]})
+                })
+            } else {
+                const value = new MessageEmbed().setTitle("Current Stock Values:").setDescription(`
+        **WY Electronics(we):**
+        ${await stock.distinct("value", {name: "we"})}
+
+        **Harry Entertainment(he):**
+        ${await stock.distinct("value", {name: "he"})}
+
+        **Taebank(tb):**
+        ${await stock.distinct("value", {name: "tb"})}
+
+        **Jin Medical(jm):**
+        ${await stock.distinct("value", {name: "jm"})}
+
+        **Heidi Information System(hs):**
+        ${await stock.distinct("value", {name: "hs"})}
+
+        <prefix>sm buy <code> <number> to buy
+        <prefix>sm sell <code> <number> to sell
+
+        Ex. -sm buy jm 10
+        Buying 10 Jin Medical stocks
+                `).setTimestamp()
+                message.channel.send({embeds:[value]})
+            }
         } else {
             message.channel.send("That is not a command")
         }
@@ -1517,6 +1523,6 @@ Bank: ${doc.data().bank}
             })
         }
     }
-	});
+});
 
 client.login("OTA0MTY4MDY0OTM1OTQ4MzI5.YX3mIQ.MPHJRXp4I8VaA_128yARBGS8X5o");
