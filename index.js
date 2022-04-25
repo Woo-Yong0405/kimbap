@@ -28,75 +28,6 @@ function death(id) {
     }, 60000)
 }
 
-async function change(id) {
-    const value = await stock.distinct("value", {name: id})
-    market.doc(`bought`).get().then((bought) => {
-        market.doc(`sold`).get().then((sold) => {
-            if (id == "jm") {
-                if (bought.data().jm > sold.data().jm) {
-                    stock.updateOne({name: id}, {$set: {value: Math.abs(value[0] + 100)}})
-                } else if (bought.data().jm < sold.data().jm) {
-                    stock.updateOne({name: id}, {$set: {value: Math.abs(value[0] - 100)}})
-                }
-                market.doc(`bought`).update({
-                    jm: 0,
-                })
-                market.doc(`sold`).update({
-                    jm: 0,
-                })
-            } else if (id == "we") {
-                if (bought.data().we > sold.data().we) {
-                    stock.updateOne({name: id}, {$set: {value: Math.abs(value[0] + 100)}})
-                } else if (bought.data().jm < sold.data().jm) {
-                    stock.updateOne({name: id}, {$set: {value: Math.abs(value[0] - 100)}})
-                }
-                market.doc(`bought`).update({
-                    we: 0,
-                })
-                market.doc(`sold`).update({
-                    we: 0,
-                })
-            } else if (id == "he") {
-                if (bought.data().he > sold.data().he) {
-                    stock.updateOne({name: id}, {$set: {value: Math.abs(value[0] + 100)}})
-                } else if (bought.data().jm < sold.data().jm) {
-                    stock.updateOne({name: id}, {$set: {value: Math.abs(value[0] - 100)}})
-                }
-                market.doc(`bought`).update({
-                    he: 0,
-                })
-                market.doc(`sold`).update({
-                    he: 0,
-                })
-            } else if (id == "hs") {
-                if (bought.data().hs > sold.data().hs) {
-                    stock.updateOne({name: id}, {$set: {value: Math.abs(value[0] + 100)}})
-                } else if (bought.data().jm < sold.data().jm) {
-                    stock.updateOne({name: id}, {$set: {value: Math.abs(value[0] - 100)}})
-                }
-                market.doc(`bought`).update({
-                    hs: 0,
-                })
-                market.doc(`sold`).update({
-                    hs: 0,
-                })
-            } else if (id == "tb") {
-                if (bought.data().tb > sold.data().tb) {
-                    stock.updateOne({name: id}, {$set: {value: Math.abs(value[0] + 100)}})
-                } else if (bought.data().jm < sold.data().jm) {
-                    stock.updateOne({name: id}, {$set: {value: Math.abs(value[0] - 100)}})
-                }
-                market.doc(`bought`).update({
-                    tb: 0,
-                })
-                market.doc(`sold`).update({
-                    tb: 0,
-                })
-            }
-        })
-    })
-}
-
 async function sChange(id) {
     const change = Math.round(Math.random()*16)
     const value = await stock.distinct("value", {name: id})
@@ -114,13 +45,6 @@ async function sChange(id) {
 }
 
 function allChange() {
-    setInterval(() => {
-        change("tb");
-        change("jm");
-        change("hs");
-        change("he");
-        change("we");
-    }, 60000)
     setInterval(() => {
         sChange("tb");
         sChange("jm");
