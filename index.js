@@ -402,7 +402,8 @@ client.on("messageCreate", async (message) => {
             tips: 0
         })
     }
-    if (message.author.id != client.user.id && message.content.startsWith(asdf.data().prefix) == true && !ban.has(message.author.id)) {
+    const prefix = await dbService.doc(`Channel Data/${message.channel.id}`).get();
+    if (message.author.id != client.user.id && message.content.startsWith(prefix.data().prefix) == true && !ban.has(message.author.id)) {
         const args = message.content.trim().split(/ +/g);
         const command = args[0].substring(1).toLowerCase();
         if (message.mentions.users.size == 0) {
@@ -1333,7 +1334,7 @@ You lost all your money
         **Jin Medical(jm):**
         ${await stock.distinct("value", {name: "jm"})}
 
-        **Heidi Information System(hs):**
+        **Jade Information System(hs):**
         ${await stock.distinct("value", {name: "hs"})}
 
         <prefix>sm buy <code> <number> to buy
