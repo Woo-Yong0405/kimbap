@@ -17,15 +17,24 @@ const market = dbService.collection(`Stock Market`);
 const database = clienta.db("economyBot");
 const stock = database.collection("stock market");
 
-function death(id) {
-    dbService.doc(`User Data/${id}`).set({
-        wallet: 0,
-        bank: 0
-    })
-    ban.add(id);
-    setTimeout(() => {
-        ban.delete(id);
-    }, 60000)
+async function death (id) {
+    let meme = await dbService.doc(`User Data/${id}`).get();
+    if (meme.data().life > 0) {
+        dbService.doc(`User Data/${id}`).update({
+            life: meme.data().life - 1
+        })
+        return `You died, but your life saver saved you! (${meme.data().life - 1} left)`
+    } else {
+        dbService.doc(`User Data/${id}`).update({
+            wallet: 0,
+            bank: 0,
+        })
+        ban.add(id);
+        setTimeout(() => {
+            ban.delete(id);
+        }, 60000)
+        return "Well.... You died, meaning a 1 minute ban AND losing all your money"
+    }
 }
 
 async function sChange(id) {
@@ -60,6 +69,11 @@ client.once("ready", () => {
         console.log("Database Initialized")
         allChange()
     });
+    setInterval(() => {
+        clienta.close()
+        clienta.connect()
+        console.log("Database Connection Reset")
+    }, 1800000)
 });
 
 client.on("interactionCreate", async (ia) => {
@@ -69,11 +83,11 @@ client.on("interactionCreate", async (ia) => {
             if (ia.customId == "rr_1_yes") {
                 const random = Math.floor(Math.random() * 6) + 1;
                     if (random === 3) {
-                        death(ia.user.id)
-                        ia.update({"content": "Well.... You died, meaning a 1 minute ban AND losing all your money", "components": []});
+                        const reply = await death(ia.user.id)
+                        ia.update({"content": reply, "components": []});
                         rr.delete(ia.user.id)
                     } else {
-                        dbService.doc(`User Data/${ia.user.id}`).set({
+                        dbService.doc(`User Data/${ia.user.id}`).update({
                             wallet: meme.data().wallet + 100,
                             bank: meme.data().bank
                         })
@@ -103,11 +117,11 @@ client.on("interactionCreate", async (ia) => {
             } else if (ia.customId == "rr_2_yes") {
                 const random = Math.floor(Math.random() * 6) + 1;
                 if (random == 1 || random == 5) {
-                    death(ia.user.id)
-                    ia.update({"content": "Well.... You died, meaning a 1 minute ban AND losing all your money", "components": []});
+                    const reply = await death(ia.user.id)
+                    ia.update({"content": reply, "components": []});
                     rr.delete(ia.user.id)
                 } else {
-                    dbService.doc(`User Data/${ia.user.id}`).set({
+                    dbService.doc(`User Data/${ia.user.id}`).update({
                         wallet: meme.data().wallet + 900,
                         bank: meme.data().bank
                     })
@@ -137,11 +151,11 @@ client.on("interactionCreate", async (ia) => {
             } else if (ia.customId == "rr_3_yes") {
                 const random = Math.floor(Math.random() * 6) + 1;
                 if (random == 1 || random == 5 || random == 4) {
-                    death(ia.user.id)
-                    ia.update({"content": "Well.... You died, meaning a 1 minute ban AND losing all your money", "components": []});
+                    const reply = await death(ia.user.id)
+                    ia.update({"content": reply, "components": []});
                     rr.delete(ia.user.id)
                 } else {
-                    dbService.doc(`User Data/${ia.user.id}`).set({
+                    dbService.doc(`User Data/${ia.user.id}`).update({
                         wallet: meme.data().wallet + 9000,
                         bank: meme.data().bank
                     })
@@ -171,11 +185,11 @@ client.on("interactionCreate", async (ia) => {
             } else if (ia.customId == "rr_4_yes") {
                 const random = Math.floor(Math.random() * 6) + 1;
                 if (random == 1 || random == 5 || random == 2 || random == 4) {
-                    death(ia.user.id)
-                    ia.update({"content": "Well.... You died, meaning a 1 minute ban AND losing all your money", "components": []});
+                    const reply = await death(ia.user.id)
+                    ia.update({"content": reply, "components": []});
                     rr.delete(ia.user.id)
                 } else {
-                    dbService.doc(`User Data/${ia.user.id}`).set({
+                    dbService.doc(`User Data/${ia.user.id}`).update({
                         wallet: meme.data().wallet + 90000,
                         bank: meme.data().bank
                     })
@@ -205,11 +219,11 @@ client.on("interactionCreate", async (ia) => {
             } else if (ia.customId == "rr_5_yes") {
                 const random = Math.floor(Math.random() * 6) + 1;
                 if (random == 1 || random == 5 || random == 2 || random == 3 || random == 6) {
-                    death(ia.user.id)
-                    ia.update({"content": "Well.... You died, meaning a 1 minute ban AND losing all your money", "components": []});
+                    const reply = await death(ia.user.id)
+                    ia.update({"content": reply, "components": []});
                     rr.delete(ia.user.id)
                 } else {
-                    dbService.doc(`User Data/${ia.user.id}`).set({
+                    dbService.doc(`User Data/${ia.user.id}`).update({
                         wallet: meme.data().wallet + 900000,
                         bank: meme.data().bank
                     })
@@ -245,11 +259,11 @@ client.on("interactionCreate", async (ia) => {
                     dbService.doc(`Tips/${ia.user.id}`).get().then((doc) => {
                         ia.update({"content": `${ia.user.username} got ${doc.data().tips} out of the tipbox.`, "components": []})
                         dbService.doc(`User Data/${ia.user.id}`).get().then((adoc) => {
-                            dbService.doc(`User Data/${ia.user.id}`).set({
+                            dbService.doc(`User Data/${ia.user.id}`).update({
                                 wallet: adoc.data().wallet + doc.data().tips,
                                 bank: adoc.data().bank
                             })
-                            dbService.doc(`Tips/${ia.user.id}`).set({
+                            dbService.doc(`Tips/${ia.user.id}`).update({
                                 tips: 0
                             })
                         })
@@ -264,7 +278,7 @@ client.on("interactionCreate", async (ia) => {
                         } else {
                             const salary = Math.round(Math.random() * 2000);
                             dbService.doc(`Tips/${ia.user.id}`).get().then((doc) => {
-                                dbService.doc(`Tips/${ia.user.id}`).set({
+                                dbService.doc(`Tips/${ia.user.id}`).update({
                                     tips: doc.data().tips + salary
                                 })
                             })
@@ -286,29 +300,29 @@ client.on("interactionCreate", async (ia) => {
                     const victim = msg.mentions.users.first().id;
                     const robber = msg.author.id;
                     if (chance <= 10) {
-                        ia.update({"content": "You died, meaning a 1 minute ban AND losing all your money. That's what you get for being so greedy lol", "components": []});
-                        death(robber)
+                        const ass = await death(ia.user.id)
+                        ia.update({"content": ass, "components": []});
                     } else if (chance <= 16) {
                         dbService.doc(`User Data/${victim}`).get().then((doc) => {
                             const netWorth = doc.data().wallet + doc.data().bank
                             if (netWorth/10 > doc.data().wallet) {
-                                dbService.doc(`User Data/${victim}`).set({
+                                dbService.doc(`User Data/${victim}`).update({
                                     wallet: 0,
                                     bank: doc.data().bank - (netWorth/10 - doc.data().wallet)
                                 })
                                 dbService.doc(`User Data/${robber}`).get().then((docs) => {
-                                    dbService.doc(`User Data/${robber}`).set({
+                                    dbService.doc(`User Data/${robber}`).update({
                                         wallet: docs.data().wallet + netWorth/10,
                                         bank: docs.data().bank
                                     })
                                 })
                             } else {
-                                dbService.doc(`User Data/${victim}`).set({
+                                dbService.doc(`User Data/${victim}`).update({
                                     wallet: doc.data().wallet-netWorth/10,
                                     bank: doc.data().bank
                                 })
                                 dbService.doc(`User Data/${robber}`).get().then((docs) => {
-                                    dbService.doc(`User Data/${robber}`).set({
+                                    dbService.doc(`User Data/${robber}`).update({
                                         wallet: docs.data().wallet + netWorth/10,
                                         bank: docs.data().bank
                                     })
@@ -320,23 +334,23 @@ client.on("interactionCreate", async (ia) => {
                         dbService.doc(`User Data/${victim}`).get().then((doc) => {
                             const netWorth = doc.data().wallet + doc.data().bank
                             if (netWorth/2 > doc.data().wallet) {
-                                dbService.doc(`User Data/${victim}`).set({
+                                dbService.doc(`User Data/${victim}`).update({
                                     wallet: 0,
                                     bank: doc.data().bank - (netWorth/2 - doc.data().wallet)
                                 })
                                 dbService.doc(`User Data/${robber}`).get().then((docs) => {
-                                    dbService.doc(`User Data/${robber}`).set({
+                                    dbService.doc(`User Data/${robber}`).update({
                                         wallet: docs.data().wallet + netWorth/2,
                                         bank: docs.data().bank
                                     })
                                 })
                             } else {
-                                dbService.doc(`User Data/${victim}`).set({
+                                dbService.doc(`User Data/${victim}`).update({
                                     wallet: doc.data().wallet-netWorth/2,
                                     bank: doc.data().bank
                                 })
                                 dbService.doc(`User Data/${robber}`).get().then((docs) => {
-                                    dbService.doc(`User Data/${robber}`).set({
+                                    dbService.doc(`User Data/${robber}`).update({
                                         wallet: docs.data().wallet + netWorth/2,
                                         bank: docs.data().bank
                                     })
@@ -347,12 +361,12 @@ client.on("interactionCreate", async (ia) => {
                     } else {
                         dbService.doc(`User Data/${victim}`).get().then((doc) => {
                             const netWorth = doc.data().wallet + doc.data().bank
-                            dbService.doc(`User Data/${victim}`).set({
+                            dbService.doc(`User Data/${victim}`).update({
                                 wallet: 0,
                                 bank: 0
                             })
                             dbService.doc(`User Data/${robber}`).get().then((docs) => {
-                                dbService.doc(`User Data/${robber}`).set({
+                                dbService.doc(`User Data/${robber}`).update({
                                     wallet: docs.data().wallet + netWorth,
                                     bank: docs.data().bank
                                 })
@@ -378,6 +392,7 @@ client.on("messageCreate", async (message) => {
         dbService.doc(`User Data/${message.author.id}`).set({
             wallet: 100,
             bank: 0,
+            life: 0,
         })
     }
     let holder = await dbService.doc(`Stock Market/${message.author.id}`).get();
@@ -398,7 +413,7 @@ client.on("messageCreate", async (message) => {
     }
     let tips = await dbService.doc(`Tips/${message.author.id}`).get();
     if (!tips.exists) {
-        dbService.doc(`Tips/${message.author.id}`).set({
+        dbService.doc(`Tips/${message.author.id}`).update({
             tips: 0
         })
     }
@@ -412,7 +427,7 @@ client.on("messageCreate", async (message) => {
         } else if (command == "prefix" || command == "p") {
             if (args[1]) {
                 if (args[1].length == 1) {
-                    dbService.doc(`Channel Data/${message.channel.id}`).set({
+                    dbService.doc(`Channel Data/${message.channel.id}`).update({
                         prefix: args[1],
                     })
                     message.channel.send("@everyone, The prefix has been changed to: " + args[1])
@@ -435,7 +450,7 @@ client.on("messageCreate", async (message) => {
                     .setColor("GREEN")
                     .setTimestamp();
                 message.channel.send({embeds:[ddd]})
-                        dbService.doc(`User Data/${message.author.id}`).set({
+                        dbService.doc(`User Data/${message.author.id}`).update({
                             wallet: meme.data().wallet + salary,
                             bank: meme.data().bank
                         });
@@ -505,13 +520,13 @@ client.on("messageCreate", async (message) => {
                 message.channel.send("The number has to be greater than 0");
             } else if (args[1] == "all") {
                 message.channel.send(`${message.author.username} deposited ${meme.data().wallet}`);
-                dbService.doc(`User Data/${message.author.id}`).set({
+                dbService.doc(`User Data/${message.author.id}`).update({
                     wallet: 0,
                     bank: meme.data().wallet + meme.data().bank
                 });
             } else if(parseInt(args[1]) > 0) {
                 message.channel.send(`${message.author.username} deposited ${args[1]}`);
-                dbService.doc(`User Data/${message.author.id}`).set({
+                dbService.doc(`User Data/${message.author.id}`).update({
                     wallet: meme.data().wallet - parseInt(args[1]),
                     bank: meme.data().bank + parseInt(args[1])
                 })
@@ -523,12 +538,12 @@ client.on("messageCreate", async (message) => {
                 message.channel.send("The number has to be greater than 0");
             } else if (args[1] == "all") {
                 message.channel.send(`${message.author.username} withdrew ${meme.data().bank}`);
-                dbService.doc(`User Data/${message.author.id}`).set({
+                dbService.doc(`User Data/${message.author.id}`).update({
                     wallet: meme.data().wallet + meme.data().bank,
                     bank: 0
                 })
             } else if (parseInt(args[1]) > 0) {
-                dbService.doc(`User Data/${message.author.id}`).set({
+                dbService.doc(`User Data/${message.author.id}`).update({
                     wallet: meme.data().wallet + parseInt(args[1]),
                     bank: meme.data().bank - parseInt(args[1])
                 })
@@ -584,7 +599,7 @@ client.on("messageCreate", async (message) => {
                                         You lost your ${parseInt(args[1])}
                                         `)
                                             message.channel.send({embeds:[ddd]});
-                                    dbService.doc(`User Data/${message.author.id}`).set({
+                                    dbService.doc(`User Data/${message.author.id}`).update({
                                         wallet: meme.data().wallet - parseInt(args[1]),
                                         bank: meme.data().bank
                                     });
@@ -598,7 +613,7 @@ client.on("messageCreate", async (message) => {
                                         You doubled your ${parseInt(args[1])}
                                         `)
                                             message.channel.send({embeds:[ddd]});
-                                    dbService.doc(`User Data/${message.author.id}`).set({
+                                    dbService.doc(`User Data/${message.author.id}`).update({
                                         wallet: meme.data().wallet + parseInt(args[1]),
                                         bank: meme.data().bank
                                     });
@@ -615,7 +630,7 @@ client.on("messageCreate", async (message) => {
                                         You lost your ${parseInt(args[1])}
                                         `)
                                         message.channel.send({embeds:[ddd]});
-                                    dbService.doc(`User Data/${message.author.id}`).set({
+                                    dbService.doc(`User Data/${message.author.id}`).update({
                                         wallet: meme.data().wallet - parseInt(args[1]),
                                         bank: meme.data().bank
                                     });
@@ -629,7 +644,7 @@ client.on("messageCreate", async (message) => {
                                         You doubled your ${parseInt(args[1])}
                                         `)
                                         message.channel.send({embeds:[ddd]});
-                                    dbService.doc(`User Data/${message.author.id}`).set({
+                                    dbService.doc(`User Data/${message.author.id}`).update({
                                         wallet: meme.data().wallet + parseInt(args[1]),
                                         bank: meme.data().bank
                                     });
@@ -646,7 +661,7 @@ client.on("messageCreate", async (message) => {
                                         You lost your ${parseInt(args[1])}
                                         `)
                                             message.channel.send({embeds:[ddd]});
-                                    dbService.doc(`User Data/${message.author.id}`).set({
+                                    dbService.doc(`User Data/${message.author.id}`).update({
                                         wallet: meme.data().wallet - parseInt(args[1]),
                                         bank: meme.data().bank
                                     });
@@ -660,7 +675,7 @@ client.on("messageCreate", async (message) => {
                                         You doubled your ${parseInt(args[1])}
                                         `)
                                             message.channel.send({embeds:[ddd]});
-                                    dbService.doc(`User Data/${message.author.id}`).set({
+                                    dbService.doc(`User Data/${message.author.id}`).update({
                                         wallet: meme.data().wallet + parseInt(args[1]),
                                         bank: meme.data().bank
                                     });
@@ -693,7 +708,7 @@ client.on("messageCreate", async (message) => {
                                     You lost all your money!
                                     `)
                                             message.channel.send({embeds:[ddd]});
-                                dbService.doc(`User Data/${message.author.id}`).set({
+                                dbService.doc(`User Data/${message.author.id}`).update({
                                     wallet: 0,
                                     bank: meme.data().bank
                                 });
@@ -707,7 +722,7 @@ client.on("messageCreate", async (message) => {
                                     You doubled all your money!
                                     `)
                                             message.channel.send({embeds:[ddd]});
-                                dbService.doc(`User Data/${message.author.id}`).set({
+                                dbService.doc(`User Data/${message.author.id}`).update({
                                     wallet: meme.data().wallet * 2,
                                     bank: meme.data().bank
                                 });
@@ -724,7 +739,7 @@ client.on("messageCreate", async (message) => {
                                     You lost all your money!
                                     `)
                                             message.channel.send({embeds:[ddd]});
-                                dbService.doc(`User Data/${message.author.id}`).set({
+                                dbService.doc(`User Data/${message.author.id}`).update({
                                     wallet: 0,
                                     bank: meme.data().bank
                                 });
@@ -738,7 +753,7 @@ client.on("messageCreate", async (message) => {
                                     You doubled all your money!
                                     `)
                                             message.channel.send({embeds:[ddd]});
-                                dbService.doc(`User Data/${message.author.id}`).set({
+                                dbService.doc(`User Data/${message.author.id}`).update({
                                     wallet: meme.data().wallet * 2,
                                     bank: meme.data().bank
                                 });
@@ -755,7 +770,7 @@ client.on("messageCreate", async (message) => {
                                     You lost all your money!
                                     `)
                                             message.channel.send({embeds:[ddd]});
-                                dbService.doc(`User Data/${message.author.id}`).set({
+                                dbService.doc(`User Data/${message.author.id}`).update({
                                     wallet: 0,
                                     bank: meme.data().bank
                                 });
@@ -769,7 +784,7 @@ client.on("messageCreate", async (message) => {
                                     You doubled all your money!
                                     `)
                                             message.channel.send({embeds:[ddd]});
-                                dbService.doc(`User Data/${message.author.id}`).set({
+                                dbService.doc(`User Data/${message.author.id}`).update({
                                     wallet: meme.data().wallet * 2,
                                     bank: meme.data().bank
                                 });
@@ -789,7 +804,7 @@ client.on("messageCreate", async (message) => {
                     if (command == "even") {
                         if (randomInt % 2 == 0) {
                             if (parseInt(args[1])) {
-                                dbService.doc(`User Data/${message.author.id}`).set({
+                                dbService.doc(`User Data/${message.author.id}`).update({
                                     wallet: meme.data().wallet + parseInt(args[1]),
                                     bank: meme.data().bank
                                 })
@@ -804,7 +819,7 @@ client.on("messageCreate", async (message) => {
                 `)
                                 message.channel.send({embeds:[ddd]})
                             } else if (args[1] == "all") {
-                                dbService.doc(`User Data/${message.author.id}`).set({
+                                dbService.doc(`User Data/${message.author.id}`).update({
                                     wallet: meme.data().wallet * 2,
                                     bank: meme.data().bank
                                 })
@@ -821,7 +836,7 @@ client.on("messageCreate", async (message) => {
                             }
                         } else {
                             if (parseInt(args[1])) {
-                                dbService.doc(`User Data/${message.author.id}`).set({
+                                dbService.doc(`User Data/${message.author.id}`).update({
                                     wallet: meme.data().wallet - parseInt(args[1]),
                                     bank: meme.data().bank
                                 })
@@ -836,7 +851,7 @@ client.on("messageCreate", async (message) => {
         `)
                                 message.channel.send({embeds:[ddd]})
                             } else if (args[1] == "all") {
-                                dbService.doc(`User Data/${message.author.id}`).set({
+                                dbService.doc(`User Data/${message.author.id}`).update({
                                     wallet: 0,
                                     bank: meme.data().bank
                                 })
@@ -856,7 +871,7 @@ client.on("messageCreate", async (message) => {
                         if (command == "odd") {
                             if (randomInt % 2 != 0) {
                                 if (parseInt(args[1])) {
-                                    dbService.doc(`User Data/${message.author.id}`).set({
+                                    dbService.doc(`User Data/${message.author.id}`).update({
                                         wallet: meme.data().wallet + parseInt(args[1]),
                                         bank: meme.data().bank
                                     })
@@ -871,7 +886,7 @@ client.on("messageCreate", async (message) => {
         `)
                                     message.channel.send({embeds:[ddd]})
                                 } else if (args[1] == "all") {
-                                    dbService.doc(`User Data/${message.author.id}`).set({
+                                    dbService.doc(`User Data/${message.author.id}`).update({
                                         wallet: meme.data().wallet*2,
                                         bank: meme.data().bank
                                     })
@@ -888,7 +903,7 @@ client.on("messageCreate", async (message) => {
                                 }
                             } else {
                                 if (parseInt(args[1])) {
-                                    dbService.doc(`User Data/${message.author.id}`).set({
+                                    dbService.doc(`User Data/${message.author.id}`).update({
                                         wallet: meme.data().wallet - parseInt(args[1]),
                                         bank: meme.data().bank
                                     })
@@ -903,7 +918,7 @@ You lost your ${args[1]}
 `)
                                     message.channel.send({embeds:[ddd]})
                                 } else if (args[1] == "all") {
-                                    dbService.doc(`User Data/${message.author.id}`).set({
+                                    dbService.doc(`User Data/${message.author.id}`).update({
                                         wallet: 0,
                                         bank: meme.data().bank
                                     })
@@ -968,33 +983,27 @@ You lost all your money
                                                 const price = value[0] * parseInt(args[3])
                                                 if (args[1] == "buy") {
                                                     if (price <= doca.data().wallet) {
-                                                        dbService.doc(`User Data/${message.author.id}`).set({
+                                                        dbService.doc(`User Data/${message.author.id}`).update({
                                                             wallet: doca.data().wallet - price,
                                                             bank: doca.data().bank
                                                         })
                                                         dbService.doc(`Stock Market/${message.author.id}`).update({
                                                             we: holder.data().we + parseInt(args[3])
                                                         })
-                                                        dbService.doc(`Stock Market/bought`).update({
-                                                            we: bought.data().we + parseInt(args[3])
-                                                        })
-                                                        message.channel.send(`${message.author.username} bought ${args[3]} ${args[2]} stocks at ${value[0]}`)
+                                                        message.channel.send(`${message.author.username} bought ${args[3]} we stocks at ${value[0]}`)
                                                     } else {
                                                         message.channel.send("You don't have that much money")
                                                     }
                                                 } else if (args[1] == "sell") {
                                                     if (parseInt(args[3]) <= holder.data().we) {
-                                                        dbService.doc(`User Data/${message.author.id}`).set({
+                                                        dbService.doc(`User Data/${message.author.id}`).update({
                                                             wallet: doca.data().wallet + price,
                                                             bank: doca.data().bank
                                                         })
                                                         dbService.doc(`Stock Market/${message.author.id}`).update({
                                                             we: holder.data().we - parseInt(args[3])
                                                         })
-                                                        dbService.doc(`Stock Market/sold`).update({
-                                                            we: sold.data().we + parseInt(args[3])
-                                                        })
-                                                        message.channel.send(`${message.author.username} sold ${args[3]} ${args[2]} stocks at ${value[0]}`)
+                                                        message.channel.send(`${message.author.username} sold ${args[3]} we stocks at ${value[0]}`)
                                                     } else {
                                                         message.channel.send("You have to have it if you want to sell it")
                                                     }
@@ -1003,30 +1012,25 @@ You lost all your money
                                                 if (args[1] == "buy") {
                                                     const possible = Math.floor(doca.data().wallet/value[0]);
                                                     const price = value[0]*possible;
-                                                    dbService.doc(`User Data/${message.author.id}`).set({
+                                                    dbService.doc(`User Data/${message.author.id}`).update({
                                                         wallet: doca.data().wallet - price,
                                                         bank: doca.data().bank
                                                     })
                                                     dbService.doc(`Stock Market/${message.author.id}`).update({
                                                         we: holder.data().we + possible
                                                     })
-                                                    dbService.doc(`Stock Market/bought`).update({
-                                                        we: bought.data().we + possible
-                                                    })
-                                                    message.channel.send(`${message.author.username} bought ${possible} ${args[2]} stocks at ${value[0]}`)
+                                                    message.channel.send(`${message.author.username} bought ${possible} we stocks at ${value[0]}`)
                                                 } else if (args[1] == "sell") {
                                                     const price = value[0]*holder.data().we;
                                                     const possible = holder.data().we
-                                                    dbService.doc(`Stock Market/sold`).update({
-                                                        we: sold.data().we + holder.data().we
-                                                    })
-                                                    dbService.doc(`User Data/${message.author.id}`).set({
+                                                    dbService.doc(`User Data/${message.author.id}`).update({
                                                         wallet: doca.data().wallet + price,
                                                         bank: doca.data().bank
                                                     })
-                                                    message.channel.send(`${message.author.username} sold ${possible} ${args[2]} stocks at ${value[0]}`)
-                                                    dbService.doc(`Stock Market/${message.author.id}`).update({
-                                                        we: 0
+                                                    message.channel.send(`${message.author.username} sold ${possible} we stocks at ${value[0]}`).then(() => {
+                                                        dbService.doc(`Stock Market/${message.author.id}`).update({
+                                                            we: 0
+                                                        })
                                                     })
                                                 }
                                             }
@@ -1035,33 +1039,27 @@ You lost all your money
                                                 const price = value[0] * parseInt(args[3])
                                                 if (args[1] == "buy") {
                                                     if (value[0] * parseInt(args[3]) <= doca.data().wallet) {
-                                                        dbService.doc(`User Data/${message.author.id}`).set({
+                                                        dbService.doc(`User Data/${message.author.id}`).update({
                                                             wallet: doca.data().wallet - price,
                                                             bank: doca.data().bank
                                                         })
                                                         dbService.doc(`Stock Market/${message.author.id}`).update({
                                                             he: holder.data().he + parseInt(args[3])
                                                         })
-                                                        dbService.doc(`Stock Market/bought`).update({
-                                                            he: bought.data().he + parseInt(args[3])
-                                                        })
-                                                        message.channel.send(`${message.author.username} bought ${args[3]} ${args[2]} stocks at ${value[0]}`)
+                                                        message.channel.send(`${message.author.username} bought ${args[3]} he stocks at ${value[0]}`)
                                                     } else {
                                                         message.channel.send("You don't have that much money")
                                                     }
                                                 } else if (args[1] == "sell") {
                                                     if (parseInt(args[3]) <= holder.data().he) {
-                                                        dbService.doc(`User Data/${message.author.id}`).set({
+                                                        dbService.doc(`User Data/${message.author.id}`).update({
                                                             wallet: doca.data().wallet + price,
                                                             bank: doca.data().bank
                                                         })
                                                         dbService.doc(`Stock Market/${message.author.id}`).update({
                                                             he: holder.data().he - parseInt(args[3])
                                                         })
-                                                        dbService.doc(`Stock Market/sold`).update({
-                                                            he: sold.data().he + parseInt(args[3])
-                                                        })
-                                                        message.channel.send(`${message.author.username} sold ${args[3]} ${args[2]} stocks at ${value[0]}`)
+                                                        message.channel.send(`${message.author.username} sold ${args[3]} he stocks at ${value[0]}`)
                                                     } else {
                                                         message.channel.send("You have to have it if you want to sell it")
                                                     }
@@ -1070,30 +1068,25 @@ You lost all your money
                                                 if (args[1] == "buy") {
                                                     const possible = Math.floor(doca.data().wallet/value[0]);
                                                     const price = value[0]*possible;
-                                                    dbService.doc(`User Data/${message.author.id}`).set({
+                                                    dbService.doc(`User Data/${message.author.id}`).update({
                                                         wallet: doca.data().wallet - price,
                                                         bank: doca.data().bank
                                                     })
                                                     dbService.doc(`Stock Market/${message.author.id}`).update({
                                                         he: holder.data().he + possible
                                                     })
-                                                    dbService.doc(`Stock Market/bought`).update({
-                                                        he: bought.data().he + possible
-                                                    })
-                                                    message.channel.send(`${message.author.username} bought ${possible} ${args[2]} stocks at ${value[0]}`)
+                                                    message.channel.send(`${message.author.username} bought ${possible} he stocks at ${value[0]}`)
                                                 } else if (args[1] == "sell") {
                                                     const price = value[0]*holder.data().he;
-                                                    const possible = holder.data().we
-                                                    dbService.doc(`Stock Market/sold`).update({
-                                                        he: sold.data().he + holder.data().he
-                                                    })
-                                                    dbService.doc(`User Data/${message.author.id}`).set({
+                                                    const possible = holder.data().he
+                                                    dbService.doc(`User Data/${message.author.id}`).update({
                                                         wallet: doca.data().wallet + price,
                                                         bank: doca.data().bank
                                                     })
-                                                    message.channel.send(`${message.author.username} sold ${possible} ${args[2]} stocks at ${value[0]}`)
-                                                    dbService.doc(`Stock Market/${message.author.id}`).update({
-                                                        he: 0
+                                                    message.channel.send(`${message.author.username} sold ${possible} he stocks at ${value[0]}`).then(() => {
+                                                        dbService.doc(`Stock Market/${message.author.id}`).update({
+                                                            he: 0
+                                                        })
                                                     })
                                                 }
                                             }
@@ -1102,33 +1095,27 @@ You lost all your money
                                                 const price = value[0] * parseInt(args[3])
                                                 if (args[1] == "buy") {
                                                     if (value[0] * parseInt(args[3]) <= doca.data().wallet) {
-                                                        dbService.doc(`User Data/${message.author.id}`).set({
+                                                        dbService.doc(`User Data/${message.author.id}`).update({
                                                             wallet: doca.data().wallet - price,
                                                             bank: doca.data().bank
                                                         })
                                                         dbService.doc(`Stock Market/${message.author.id}`).update({
                                                             tb: holder.data().tb + parseInt(args[3])
                                                         })
-                                                        dbService.doc(`Stock Market/bought`).update({
-                                                            tb: bought.data().tb + parseInt(args[3])
-                                                        })
-                                                        message.channel.send(`${message.author.username} bought ${args[3]} ${args[2]} stocks at ${value[0]}`)
+                                                        message.channel.send(`${message.author.username} bought ${args[3]} tb stocks at ${value[0]}`)
                                                     } else {
                                                         message.channel.send("You don't have that much money")
                                                     }
                                                 } else if (args[1] == "sell") {
                                                     if (parseInt(args[3]) <= holder.data().tb) {
-                                                        dbService.doc(`User Data/${message.author.id}`).set({
+                                                        dbService.doc(`User Data/${message.author.id}`).update({
                                                             wallet: doca.data().wallet + price,
                                                             bank: doca.data().bank
                                                         })
                                                         dbService.doc(`Stock Market/${message.author.id}`).update({
                                                             tb: holder.data().tb - parseInt(args[3])
                                                         })
-                                                        dbService.doc(`Stock Market/sold`).update({
-                                                            tb: sold.data().tb + parseInt(args[3])
-                                                        })
-                                                        message.channel.send(`${message.author.username} sold ${args[3]} ${args[2]} stocks at ${value[0]}`)
+                                                        message.channel.send(`${message.author.username} sold ${args[3]} tb stocks at ${value[0]}`)
                                                     } else {
                                                         message.channel.send("You have to have it if you want to sell it")
                                                     }
@@ -1137,30 +1124,25 @@ You lost all your money
                                                 if (args[1] == "buy") {
                                                     const possible = Math.floor(doca.data().wallet/value[0]);
                                                     const price = value[0]*possible;
-                                                    dbService.doc(`User Data/${message.author.id}`).set({
+                                                    dbService.doc(`User Data/${message.author.id}`).update({
                                                         wallet: doca.data().wallet - price,
                                                         bank: doca.data().bank
                                                     })
                                                     dbService.doc(`Stock Market/${message.author.id}`).update({
                                                         tb: holder.data().tb + possible
                                                     })
-                                                    dbService.doc(`Stock Market/bought`).update({
-                                                        tb: bought.data().tb + possible
-                                                    })
-                                                    message.channel.send(`${message.author.username} bought ${possible} ${args[2]} stocks at ${value[0]}`)
+                                                    message.channel.send(`${message.author.username} bought ${possible} tb stocks at ${value[0]}`)
                                                 } else if (args[1] == "sell") {
                                                     const price = value[0]*holder.data().tb;
-                                                    const possible = holder.data().we
-                                                    dbService.doc(`Stock Market/sold`).update({
-                                                        tb: sold.data().tb + holder.data().tb
-                                                    })
-                                                    dbService.doc(`User Data/${message.author.id}`).set({
+                                                    const possible = holder.data().tb
+                                                    dbService.doc(`User Data/${message.author.id}`).update({
                                                         wallet: doca.data().wallet + price,
                                                         bank: doca.data().bank
                                                     })
-                                                    message.channel.send(`${message.author.username} sold ${possible} ${args[2]} stocks at ${value[0]}`)
-                                                    dbService.doc(`Stock Market/${message.author.id}`).update({
-                                                        tb: 0
+                                                    message.channel.send(`${message.author.username} sold ${possible} tb stocks at ${value[0]}`).then(() => {
+                                                        dbService.doc(`Stock Market/${message.author.id}`).update({
+                                                            tb: 0
+                                                        })
                                                     })
                                                 }
                                             }
@@ -1169,33 +1151,27 @@ You lost all your money
                                                 const price = value[0] * parseInt(args[3])
                                                 if (args[1] == "buy") {
                                                     if (value[0] * parseInt(args[3]) <= doca.data().wallet) {
-                                                        dbService.doc(`User Data/${message.author.id}`).set({
+                                                        dbService.doc(`User Data/${message.author.id}`).update({
                                                             wallet: doca.data().wallet - price,
                                                             bank: doca.data().bank
                                                         })
                                                         dbService.doc(`Stock Market/${message.author.id}`).update({
                                                             jm: holder.data().jm + parseInt(args[3])
                                                         })
-                                                        dbService.doc(`Stock Market/bought`).update({
-                                                            jm: bought.data().jm + parseInt(args[3])
-                                                        })
-                                                        message.channel.send(`${message.author.username} bought ${args[3]} ${args[2]} stocks at ${value[0]}`)
+                                                        message.channel.send(`${message.author.username} bought ${args[3]} jm stocks at ${value[0]}`)
                                                     } else {
                                                         message.channel.send("You don't have that much money")
                                                     }
                                                 } else if (args[1] == "sell") {
                                                     if (parseInt(args[3]) <= holder.data().jm) {
-                                                        dbService.doc(`User Data/${message.author.id}`).set({
+                                                        dbService.doc(`User Data/${message.author.id}`).update({
                                                             wallet: doca.data().wallet + price,
                                                             bank: doca.data().bank
                                                         })
                                                         dbService.doc(`Stock Market/${message.author.id}`).update({
                                                             jm: holder.data().jm - parseInt(args[3])
                                                         })
-                                                        dbService.doc(`Stock Market/sold`).update({
-                                                            jm: sold.data().jm + parseInt(args[3])
-                                                        })
-                                                        message.channel.send(`${message.author.username} sold ${args[3]} ${args[2]} stocks at ${value[0]}`)
+                                                        message.channel.send(`${message.author.username} sold ${args[3]} jm stocks at ${value[0]}`)
                                                     } else {
                                                         message.channel.send("You have to have it if you want to sell it")
                                                     }
@@ -1204,30 +1180,25 @@ You lost all your money
                                                 if (args[1] == "buy") {
                                                     const possible = Math.floor(doca.data().wallet/value[0]);
                                                     const price = value[0]*possible;
-                                                    dbService.doc(`User Data/${message.author.id}`).set({
+                                                    dbService.doc(`User Data/${message.author.id}`).update({
                                                         wallet: doca.data().wallet - price,
                                                         bank: doca.data().bank
                                                     })
                                                     dbService.doc(`Stock Market/${message.author.id}`).update({
                                                         jm: holder.data().jm + possible
                                                     })
-                                                    dbService.doc(`Stock Market/bought`).update({
-                                                        jm: bought.data().jm + possible
-                                                    })
-                                                    message.channel.send(`${message.author.username} bought ${possible} ${args[2]} stocks at ${value[0]}`)
+                                                    message.channel.send(`${message.author.username} bought ${possible} jm stocks at ${value[0]}`)
                                                 } else if (args[1] == "sell") {
                                                     const price = value[0]*holder.data().jm;
-                                                    const possible = holder.data().we
-                                                    dbService.doc(`Stock Market/sold`).update({
-                                                        jm: sold.data().jm + holder.data().jm
-                                                    })
-                                                    dbService.doc(`User Data/${message.author.id}`).set({
+                                                    const possible = holder.data().jm
+                                                    dbService.doc(`User Data/${message.author.id}`).update({
                                                         wallet: doca.data().wallet + price,
                                                         bank: doca.data().bank
                                                     })
-                                                    message.channel.send(`${message.author.username} sold ${possible} ${args[2]} stocks at ${value[0]}`)
-                                                    dbService.doc(`Stock Market/${message.author.id}`).update({
-                                                        jm: 0
+                                                    message.channel.send(`${message.author.username} sold ${possible} jm stocks at ${value[0]}`).then(() => {
+                                                        dbService.doc(`Stock Market/${message.author.id}`).update({
+                                                            jm: 0
+                                                        })
                                                     })
                                                 }
                                             }
@@ -1236,33 +1207,27 @@ You lost all your money
                                                 const price = value[0] * parseInt(args[3])
                                                 if (args[1] == "buy") {
                                                     if (value[0] * parseInt(args[3]) <= doca.data().wallet) {
-                                                        dbService.doc(`User Data/${message.author.id}`).set({
+                                                        dbService.doc(`User Data/${message.author.id}`).update({
                                                             wallet: doca.data().wallet - price,
                                                             bank: doca.data().bank
                                                         })
                                                         dbService.doc(`Stock Market/${message.author.id}`).update({
                                                             hs: holder.data().hs + parseInt(args[3])
                                                         })
-                                                        dbService.doc(`Stock Market/bought`).update({
-                                                            hs: bought.data().hs + parseInt(args[3])
-                                                        })
-                                                        message.channel.send(`${message.author.username} bought ${args[3]} ${args[2]} stocks at ${value[0]}`)
+                                                        message.channel.send(`${message.author.username} bought ${args[3]} hs stocks at ${value[0]}`)
                                                     } else {
                                                         message.channel.send("You don't have that much money")
                                                     }
                                                 } else if (args[1] == "sell") {
                                                     if (parseInt(args[3]) <= holder.data().hs) {
-                                                        dbService.doc(`User Data/${message.author.id}`).set({
+                                                        dbService.doc(`User Data/${message.author.id}`).update({
                                                             wallet: doca.data().wallet + price,
                                                             bank: doca.data().bank
                                                         })
                                                         dbService.doc(`Stock Market/${message.author.id}`).update({
                                                             hs: holder.data().hs - parseInt(args[3])
                                                         })
-                                                        dbService.doc(`Stock Market/sold`).update({
-                                                            hs: sold.data().hs + parseInt(args[3])
-                                                        })
-                                                        message.channel.send(`${message.author.username} sold ${args[3]} ${args[2]} stocks at ${value[0]}`)
+                                                        message.channel.send(`${message.author.username} sold ${args[3]} hs stocks at ${value[0]}`)
                                                     } else {
                                                         message.channel.send("You have to have it if you want to sell it")
                                                     }
@@ -1271,30 +1236,25 @@ You lost all your money
                                                 if (args[1] == "buy") {
                                                     const possible = Math.floor(doca.data().wallet/value[0]);
                                                     const price = value[0]*possible;
-                                                    dbService.doc(`User Data/${message.author.id}`).set({
+                                                    dbService.doc(`User Data/${message.author.id}`).update({
                                                         wallet: doca.data().wallet - price,
                                                         bank: doca.data().bank
                                                     })
                                                     dbService.doc(`Stock Market/${message.author.id}`).update({
                                                         hs: holder.data().hs + possible
                                                     })
-                                                    dbService.doc(`Stock Market/bought`).update({
-                                                        hs: bought.data().hs + possible
-                                                    })
-                                                    message.channel.send(`${message.author.username} bought ${possible} ${args[2]} stocks at ${value[0]}`)
+                                                    message.channel.send(`${message.author.username} bought ${possible} hs stocks at ${value[0]}`)
                                                 } else if (args[1] == "sell") {
                                                     const price = value[0]*holder.data().hs;
-                                                    const possible = holder.data().we
-                                                    dbService.doc(`Stock Market/sold`).update({
-                                                        hs: sold.data().hs + holder.data().hs
-                                                    })
-                                                    dbService.doc(`User Data/${message.author.id}`).set({
+                                                    const possible = holder.data().hs
+                                                    dbService.doc(`User Data/${message.author.id}`).update({
                                                         wallet: doca.data().wallet + price,
                                                         bank: doca.data().bank
                                                     })
-                                                    message.channel.send(`${message.author.username} sold ${possible} ${args[2]} stocks at ${value[0]}`)
-                                                    dbService.doc(`Stock Market/${message.author.id}`).update({
-                                                        hs: 0
+                                                    message.channel.send(`${message.author.username} sold ${possible} hs stocks at ${value[0]}`).then(() => {
+                                                        dbService.doc(`Stock Market/${message.author.id}`).update({
+                                                            hs: 0
+                                                        })
                                                     })
                                                 }
                                             }
@@ -1345,6 +1305,54 @@ You lost all your money
                 `).setTimestamp()
                 message.channel.send({embeds:[value]})
             }
+        } else if (command == "life") {
+            switch (args[1]) {
+                case "buy":
+                    if (parseInt(args[2]) > 0) {
+                        if (meme.data().wallet >= parseInt(args[2])*100000) {
+                            dbService.doc(`User Data/${message.author.id}`).update({
+                                life: meme.data().life + parseInt(args[2]),
+                                wallet: meme.data().wallet - (parseInt(args[2])*100000),
+                            })
+                            message.reply(`${message.author.username} bought ${args[2]} life savers!`)
+                        } else {
+                            message.reply("You don't have that much money in your wallet")
+                        }
+                    } else if (args[2] == "max") {
+                        const possible = Math.floor(meme.data().wallet / 100000)
+                        const price = possible * 100000
+                        dbService.doc(`User Data/${message.author.id}`).update({
+                            life: meme.data().life + possible,
+                            wallet: meme.data().wallet - price,
+                        })
+                        message.reply(`${message.author.username} bought ${possible} life savers!`)
+                    }
+                    break;
+                case "sell":
+                    if (parseInt(args[2]) >= meme.data().life ) {
+                        dbService.doc(`User Data/${message.author.id}`).update({
+                            life: meme.data().life - parseInt(args[2]),
+                            wallet: meme.data().wallet + (parseInt(args[2])*10000),
+                        })
+                        message.reply(`${message.author.username} sold ${args[2]} life savers!`)
+                    } else if (args[2] == "max") {
+                        const number = meme.data().life
+                        dbService.doc(`User Data/${message.author.id}`).update({
+                            life: 0,
+                            wallet: meme.data().wallet + number*10000,
+                        })
+                        message.reply(`${message.author.username} sold ${number} life savers!`)
+                    }
+                    break;
+                default:
+                    const aas = new MessageEmbed().setTitle("Life Saver! (" + meme.data().life + " owned)").setDescription(`
+                    Description: They can prevent you from losing money whenever you die! (One-time use)
+                    Buying Price: 100000
+                    Selling Price: 10000
+                    `).setColor("RED")
+                    message.channel.send({embeds: [aas]})
+                    break;
+            }
         } else {
             message.channel.send("That is not a command")
         }
@@ -1368,11 +1376,11 @@ Bank: ${doc.data().bank}
                                 if (parseInt(args[2]) >= 0) {
                                     if (asdf != client.user.id) {
                                         if (asdf != message.author.id) {
-                                            dbService.doc(`User Data/${message.author.id}`).set({
+                                            dbService.doc(`User Data/${message.author.id}`).update({
                                                 wallet: meme.data().wallet - parseInt(args[2]),
                                                 bank: meme.data().bank
                                             });
-                                            dbService.doc(`User Data/${message.mentions.users.first().id}`).set({
+                                            dbService.doc(`User Data/${message.mentions.users.first().id}`).update({
                                                 wallet: doc.data().wallet + parseInt(args[2]),
                                                 bank: doc.data().bank
                                             });
@@ -1393,11 +1401,11 @@ Bank: ${doc.data().bank}
                             if (asdf != client.user.id) {
                                 if (asdf != message.author.id) {
                                     message.channel.send(`${message.author.username} gave all of his money to ${message.mentions.users.first().username}`)
-                                        dbService.doc(`User Data/${message.mentions.users.first().id}`).set({
+                                        dbService.doc(`User Data/${message.mentions.users.first().id}`).update({
                                             wallet: doc.data().wallet + meme.data().wallet,
                                             bank: doc.data().bank
                                         });
-                                        dbService.doc(`User Data/${message.author.id}`).set({
+                                        dbService.doc(`User Data/${message.author.id}`).update({
                                             wallet: 0,
                                             bank: meme.data().bank
                                         });
@@ -1450,4 +1458,4 @@ Bank: ${doc.data().bank}
     }
 });
 
-client.login("OTA0MTY4MDY0OTM1OTQ4MzI5.Gb0fz2.IY8a3l45DFCdfLDEsoNL-ISDP_0-GGxrR-YMhI");
+client.login("OTA0MTY4MDY0OTM1OTQ4MzI5.GEQjdu.QSEgXW6yVxlGSdXP__dCgABFEFcMKsZ6BBzp5o");
