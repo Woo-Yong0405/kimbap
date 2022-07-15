@@ -1439,7 +1439,7 @@ Bank: ${doc.data().bank}
                                 message.reply("I was thinking you would be smart enough not to know that you can't rob a bot, but this proves me wrong")
                             }
                         } else {
-                            message.reply("Why tf are you trying to rob yourself")
+                            message.reply("Why tf are you trying to rob yourself");
                         }
                     } else {
                         message.reply("Please specify who you're robbing")
