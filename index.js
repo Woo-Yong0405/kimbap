@@ -1450,4 +1450,4 @@ Bank: ${doc.data().bank}
     }
 });
 
-client.login("OTA0MTY4MDY0OTM1OTQ4MzI5.GGAoZ0.RJK8NYI3XyUTqusXPvhP7z6BIdbNIVkLVrCzzY");
+client.login(process.env.TOKEN);
