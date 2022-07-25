@@ -17,7 +17,7 @@ const market = dbService.collection(`Stock Market`);
 const database = clienta.db("economyBot");
 const stock = database.collection("stock market");
 
-async function death (id) {
+async function death (id : string) {
     let meme = await dbService.doc(`User Data/${id}`).get();
     if (meme.data().life > 0) {
         dbService.doc(`User Data/${id}`).update({
@@ -37,7 +37,7 @@ async function death (id) {
     }
 }
 
-async function sChange(id) {
+async function sChange(id : string) {
     const change = Math.round(Math.random()*16)
     const value = await stock.distinct("value", {name: id})
     if (id == "jm") {
@@ -575,7 +575,7 @@ client.on("messageCreate", async (message) => {
                         } else if (parseInt(args[1]) > meme.data().wallet) {
                             message.channel.send("You don't have that much money in your wallet");
                         } else {
-                            const rsp = ["rock", "paper", "scissor"];
+                            const rsp : string[] = ["rock", "paper", "scissor"];
                             const chosen = rsp[Math.floor(Math.random() * 3)]
                             if (command === chosen) {
                                 const ddd = new MessageEmbed().setColor("YELLOW").setTitle(`${message.author.username}'s rock scissor paper game results`).setDescription(`
