@@ -17,7 +17,11 @@ const market = dbService.collection(`Stock Market`);
 const database = clienta.db("economyBot");
 const stock = database.collection("stock market");
 
+<<<<<<< HEAD:index.ts
 async function death (id:string) {
+=======
+async function death (id) {
+>>>>>>> b35fbf1025e43b0592ecbf7f95ebe82471ee9a77:index.js
     let meme = await dbService.doc(`User Data/${id}`).get();
     if (meme.data().life > 0) {
         dbService.doc(`User Data/${id}`).update({
@@ -64,7 +68,7 @@ function allChange() {
 }
 
 client.once("ready", () => {
-	console.log(`Logged in as ${client.user.tag}`);
+console.log(`Logged in as ${client.user.tag}`);
     clienta.connect().then(() => {
         console.log("Database Initialized")
         allChange()
@@ -258,7 +262,11 @@ client.on("interactionCreate", async (ia:any) => {
                 case "tips__get":
                     dbService.doc(`Tips/${ia.user.id}`).get().then((doc:any) => {
                         ia.update({"content": `${ia.user.username} got ${doc.data().tips} out of the tipbox.`, "components": []})
+<<<<<<< HEAD:index.ts
                         dbService.doc(`User Data/${ia.user.id}`).get().then((adoc:any) => {
+=======
+                        dbService.doc(`User Data/${ia.user.id}`).get().then((adoc) => {
+>>>>>>> b35fbf1025e43b0592ecbf7f95ebe82471ee9a77:index.js
                             dbService.doc(`User Data/${ia.user.id}`).update({
                                 wallet: adoc.data().wallet + doc.data().tips,
                                 bank: adoc.data().bank
@@ -277,7 +285,11 @@ client.on("interactionCreate", async (ia:any) => {
                             ia.channel.send({"content": `Nobody wants to give you tips...`, "components": []})
                         } else {
                             const salary = Math.round(Math.random() * 2000);
+<<<<<<< HEAD:index.ts
                             dbService.doc(`Tips/${ia.user.id}`).get().then((doc:any) => {
+=======
+                            dbService.doc(`Tips/${ia.user.id}`).get().then((doc) => {
+>>>>>>> b35fbf1025e43b0592ecbf7f95ebe82471ee9a77:index.js
                                 dbService.doc(`Tips/${ia.user.id}`).update({
                                     tips: doc.data().tips + salary
                                 })
@@ -310,7 +322,11 @@ client.on("interactionCreate", async (ia:any) => {
                                     wallet: 0,
                                     bank: doc.data().bank - (netWorth/10 - doc.data().wallet)
                                 })
+<<<<<<< HEAD:index.ts
                                 dbService.doc(`User Data/${robber}`).get().then((docs:any) => {
+=======
+                                dbService.doc(`User Data/${robber}`).get().then((docs) => {
+>>>>>>> b35fbf1025e43b0592ecbf7f95ebe82471ee9a77:index.js
                                     dbService.doc(`User Data/${robber}`).update({
                                         wallet: docs.data().wallet + netWorth/10,
                                         bank: docs.data().bank
@@ -321,7 +337,11 @@ client.on("interactionCreate", async (ia:any) => {
                                     wallet: doc.data().wallet-netWorth/10,
                                     bank: doc.data().bank
                                 })
+<<<<<<< HEAD:index.ts
                                 dbService.doc(`User Data/${robber}`).get().then((docs:any) => {
+=======
+                                dbService.doc(`User Data/${robber}`).get().then((docs) => {
+>>>>>>> b35fbf1025e43b0592ecbf7f95ebe82471ee9a77:index.js
                                     dbService.doc(`User Data/${robber}`).update({
                                         wallet: docs.data().wallet + netWorth/10,
                                         bank: docs.data().bank
@@ -338,7 +358,11 @@ client.on("interactionCreate", async (ia:any) => {
                                     wallet: 0,
                                     bank: doc.data().bank - (netWorth/2 - doc.data().wallet)
                                 })
+<<<<<<< HEAD:index.ts
                                 dbService.doc(`User Data/${robber}`).get().then((docs:any) => {
+=======
+                                dbService.doc(`User Data/${robber}`).get().then((docs) => {
+>>>>>>> b35fbf1025e43b0592ecbf7f95ebe82471ee9a77:index.js
                                     dbService.doc(`User Data/${robber}`).update({
                                         wallet: docs.data().wallet + netWorth/2,
                                         bank: docs.data().bank
@@ -349,7 +373,11 @@ client.on("interactionCreate", async (ia:any) => {
                                     wallet: doc.data().wallet-netWorth/2,
                                     bank: doc.data().bank
                                 })
+<<<<<<< HEAD:index.ts
                                 dbService.doc(`User Data/${robber}`).get().then((docs:any) => {
+=======
+                                dbService.doc(`User Data/${robber}`).get().then((docs) => {
+>>>>>>> b35fbf1025e43b0592ecbf7f95ebe82471ee9a77:index.js
                                     dbService.doc(`User Data/${robber}`).update({
                                         wallet: docs.data().wallet + netWorth/2,
                                         bank: docs.data().bank
@@ -365,7 +393,11 @@ client.on("interactionCreate", async (ia:any) => {
                                 wallet: 0,
                                 bank: 0
                             })
+<<<<<<< HEAD:index.ts
                             dbService.doc(`User Data/${robber}`).get().then((docs:any) => {
+=======
+                            dbService.doc(`User Data/${robber}`).get().then((docs) => {
+>>>>>>> b35fbf1025e43b0592ecbf7f95ebe82471ee9a77:index.js
                                 dbService.doc(`User Data/${robber}`).update({
                                     wallet: docs.data().wallet + netWorth,
                                     bank: docs.data().bank
@@ -581,9 +613,9 @@ client.on("messageCreate", async (message:any) => {
                                 const ddd = new MessageEmbed().setColor("YELLOW").setTitle(`${message.author.username}'s rock scissor paper game results`).setDescription(`
                                 You did: ${command}
                                 I did: ${chosen}
-                                
+                               
                                 Tie!
-                                
+                               
                                 You got your ${parseInt(args[1])} back
                                 `);
                                             message.channel.send({embeds:[ddd]});
@@ -593,9 +625,9 @@ client.on("messageCreate", async (message:any) => {
                                         const ddd = new MessageEmbed().setColor("RED").setTitle(`${message.author.username}'s rock scissor paper game results`).setDescription(`
                                         You did: ${command}
                                         I did: ${chosen}
-                                        
+                                       
                                         You Lost!
-                                        
+                                       
                                         You lost your ${parseInt(args[1])}
                                         `)
                                             message.channel.send({embeds:[ddd]});
@@ -607,9 +639,9 @@ client.on("messageCreate", async (message:any) => {
                                         const ddd = new MessageEmbed().setColor("GREEN").setTitle(`${message.author.username}'s rock scissor paper game results`).setDescription(`
                                         You did: ${command}
                                         I did: ${chosen}
-                                        
+                                       
                                         You Won!
-                                        
+                                       
                                         You doubled your ${parseInt(args[1])}
                                         `)
                                             message.channel.send({embeds:[ddd]});
@@ -624,9 +656,9 @@ client.on("messageCreate", async (message:any) => {
                                         const ddd = new MessageEmbed().setColor("RED").setTitle(`${message.author.username}'s rock scissor paper game results`).setDescription(`
                                         You did: ${command}
                                         I did: ${chosen}
-                                        
+                                       
                                         You Lost!d
-                                        
+                                       
                                         You lost your ${parseInt(args[1])}
                                         `)
                                         message.channel.send({embeds:[ddd]});
@@ -638,9 +670,9 @@ client.on("messageCreate", async (message:any) => {
                                         const ddd = new MessageEmbed().setColor("GREEN").setTitle(`${message.author.username}'s rock scissor paper game results`).setDescription(`
                                         You did: ${command}
                                         I did: ${chosen}
-                                        
+                                       
                                         You Won!
-                                        
+                                       
                                         You doubled your ${parseInt(args[1])}
                                         `)
                                         message.channel.send({embeds:[ddd]});
@@ -655,9 +687,9 @@ client.on("messageCreate", async (message:any) => {
                                         const ddd = new MessageEmbed().setColor("RED").setTitle(`${message.author.username}'s rock scissor paper game results`).setDescription(`
                                         You did: ${command}
                                         I did: ${chosen}
-                                        
+                                       
                                         You Lost!
-                                        
+                                       
                                         You lost your ${parseInt(args[1])}
                                         `)
                                             message.channel.send({embeds:[ddd]});
@@ -669,9 +701,9 @@ client.on("messageCreate", async (message:any) => {
                                         const ddd = new MessageEmbed().setColor("GREEN").setTitle(`${message.author.username}'s rock scissor paper game results`).setDescription(`
                                         You did: ${command}
                                         I did: ${chosen}
-                                        
+                                       
                                         You Won!
-                                        
+                                       
                                         You doubled your ${parseInt(args[1])}
                                         `)
                                             message.channel.send({embeds:[ddd]});
@@ -690,9 +722,9 @@ client.on("messageCreate", async (message:any) => {
                             const ddd = new MessageEmbed().setColor("YELLOW").setTitle(`${message.author.username}'s rock scissor paper game results`).setDescription(`
                             You did: ${command}
                             I did: ${chosen}
-                            
+                           
                             Tie!
-                            
+                           
                             Nothing changes
                             `)
                                             message.channel.send({embeds:[ddd]});
@@ -702,9 +734,9 @@ client.on("messageCreate", async (message:any) => {
                                     const ddd = new MessageEmbed().setColor("RED").setTitle(`${message.author.username}'s rock scissor paper game results`).setDescription(`
                                     You did: ${command}
                                     I did: ${chosen}
-                                    
+                                   
                                     You Lost!
-                                    
+                                   
                                     You lost all your money!
                                     `)
                                             message.channel.send({embeds:[ddd]});
@@ -716,9 +748,9 @@ client.on("messageCreate", async (message:any) => {
                                     const ddd = new MessageEmbed().setColor("GREEN").setTitle(`${message.author.username}'s rock scissor paper game results`).setDescription(`
                                     You did: ${command}
                                     I did: ${chosen}
-                                    
+                                   
                                     You Won!
-                                    
+                                   
                                     You doubled all your money!
                                     `)
                                             message.channel.send({embeds:[ddd]});
@@ -733,9 +765,9 @@ client.on("messageCreate", async (message:any) => {
                                     const ddd = new MessageEmbed().setColor("RED").setTitle(`${message.author.username}'s rock scissor paper game results`).setDescription(`
                                     You did: ${command}
                                     I did: ${chosen}
-                                    
+                                   
                                     You Lost!
-                                    
+                                   
                                     You lost all your money!
                                     `)
                                             message.channel.send({embeds:[ddd]});
@@ -747,9 +779,9 @@ client.on("messageCreate", async (message:any) => {
                                     const ddd = new MessageEmbed().setColor("GREEN").setTitle(`${message.author.username}'s rock scissor paper game results`).setDescription(`
                                     You did: ${command}
                                     I did: ${chosen}
-                                    
+                                   
                                     You Won!
-                                    
+                                   
                                     You doubled all your money!
                                     `)
                                             message.channel.send({embeds:[ddd]});
@@ -764,9 +796,9 @@ client.on("messageCreate", async (message:any) => {
                                     const ddd = new MessageEmbed().setColor("RED").setTitle(`${message.author.username}'s rock scissor paper game results`).setDescription(`
                                     You did: ${command}
                                     I did: ${chosen}
-                                    
+                                   
                                     You Lost!
-                                    
+                                   
                                     You lost all your money!
                                     `)
                                             message.channel.send({embeds:[ddd]});
@@ -778,9 +810,9 @@ client.on("messageCreate", async (message:any) => {
                                     const ddd = new MessageEmbed().setColor("GREEN").setTitle(`${message.author.username}'s rock scissor paper game results`).setDescription(`
                                     You did: ${command}
                                     I did: ${chosen}
-                                    
+                                   
                                     You Won!
-                                    
+                                   
                                     You doubled all your money!
                                     `)
                                             message.channel.send({embeds:[ddd]});
@@ -974,8 +1006,15 @@ You lost all your money
                 if (args[2] == "we" || args[2] == "he" || args[2] == "tb" || args[2] == "jm" || args[2] == "hs") {
                     if (parseInt(args[3]) || args[3] == "max") {
                         const value = await stock.distinct("value", {name: args[2]})
+<<<<<<< HEAD:index.ts
                         dbService.doc(`User Data/${message.author.id}`).get().then((doca:any) => {
                             dbService.doc(`Stock Market/${message.author.id}`).get().then((holder:any) => { 
+=======
+                        dbService.doc(`User Data/${message.author.id}`).get().then((doca) => {
+                            dbService.doc(`Stock Market/${message.author.id}`).get().then((holder) => {
+                                dbService.doc(`Stock Market/bought`).get().then((bought) => {
+                                    dbService.doc(`Stock Market/sold`).get().then((sold) => {
+>>>>>>> b35fbf1025e43b0592ecbf7f95ebe82471ee9a77:index.js
                                         if (args[2] == "we") {
                                             if (parseInt(args[3])) {
                                                 const price = value[0] * parseInt(args[3])
@@ -1257,7 +1296,13 @@ You lost all your money
                                                 }
                                             }
                                         }
+<<<<<<< HEAD:index.ts
                                     }) 
+=======
+                                    })
+                                })
+                            })
+>>>>>>> b35fbf1025e43b0592ecbf7f95ebe82471ee9a77:index.js
                         })
                     } else {
                         message.channel.send("You need to say how many you're buying")
@@ -1454,4 +1499,8 @@ Bank: ${doc.data().bank}
     }
 });
 
+<<<<<<< HEAD:index.ts
 client.login("OTA0MTY4MDY0OTM1OTQ4MzI5.Gq3UOX.-JiNDlEyN1-sKAqj2u3ZmgrwVbXdTLKWkIy6Eo");
+=======
+client.login("OTA0MTY4MDY0OTM1OTQ4MzI5.GEQjdu.QSEgXW6yVxlGSdXP__dCgABFEFcMKsZ6BBzp5o");
+>>>>>>> b35fbf1025e43b0592ecbf7f95ebe82471ee9a77:index.js
