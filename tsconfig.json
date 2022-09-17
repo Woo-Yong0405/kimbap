@@ -11,8 +11,7 @@
     "allowJs": true,
     "checkJs": false,
     "resolveJsonModule": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true
   },
   "exclude": ["node_modules"]
 }

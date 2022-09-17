@@ -17,7 +17,7 @@ const market = dbService.collection(`Stock Market`);
 const database = clienta.db("economyBot");
 const stock = database.collection("stock market");
 
-async function death (id:string) {
+async function death (id) {
     let meme = await dbService.doc(`User Data/${id}`).get();
     if (meme.data().life > 0) {
         dbService.doc(`User Data/${id}`).update({
@@ -37,7 +37,7 @@ async function death (id:string) {
     }
 }
 
-async function sChange(id : string) {
+async function sChange(id) {
     const change = Math.round(Math.random()*16)
     const value = await stock.distinct("value", {name: id})
     if (id == "jm") {
@@ -76,7 +76,7 @@ client.once("ready", () => {
     }, 1800000)
 });
 
-client.on("interactionCreate", async (ia:any) => {
+client.on("interactionCreate", async (ia) => {
     let meme = await dbService.doc(`User Data/${ia.user.id}`).get();
     if (ia.isButton) {
         if (rr.has(ia.user.id)) {
@@ -256,7 +256,7 @@ client.on("interactionCreate", async (ia:any) => {
         if (tipsA.has(ia.user.id)) {
             switch (ia.customId) {
                 case "tips__get":
-                    dbService.doc(`Tips/${ia.user.id}`).get().then((doc:any) => {
+                    dbService.doc(`Tips/${ia.user.id}`).get().then((doc) => {
                         ia.update({"content": `${ia.user.username} got ${doc.data().tips} out of the tipbox.`, "components": []})
                         dbService.doc(`User Data/${ia.user.id}`).get().then((adoc:any) => {
                             dbService.doc(`User Data/${ia.user.id}`).update({
