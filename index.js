@@ -1,8 +1,25 @@
-const { Client, MessageEmbed, Intents } = require("discord.js");
-const client = new Client({intents:[Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES]});
+const { Client, MessageEmbed, Intents, GatewayIntentBits, Events, Collection, ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } = require("discord.js");
+const client = new Client({intents:[GatewayIntentBits.Guilds]});
 const fb = require("./fb");
+require("dotenv").config()
 
-const work = new Set();
+const fs = require("node:fs");
+const path = require("node:path");
+client.commands = new Collection();
+
+const commandsPath = path.join(__dirname, 'commands');
+const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
+
+for (const file of commandFiles) {
+	const filePath = path.join(commandsPath, file);
+	const command = require(filePath);
+	if ('data' in command && 'execute' in command) {
+		client.commands.set(command.data.name, command);
+	} else {
+		console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
+	}
+}
+
 const ban = new Set();
 const rr = new Set();
 const tipsA = new Set();
@@ -63,8 +80,8 @@ function allChange() {
     }, 1000)
 }
 
-client.once("ready", () => {
-	console.log(`Logged in as ${client.user.tag}`);
+client.once(Events.ClientReady, () => {
+	console.log(`Logged in as ${client.user.tag}. Currently in ${client.guilds.cache.size} servers`);
     clienta.connect().then(() => {
         console.log("Database Initialized")
         allChange()
@@ -76,9 +93,249 @@ client.once("ready", () => {
     }, 1800000)
 });
 
-client.on("interactionCreate", async (ia) => {
+client.on(Events.InteractionCreate, async (ia) => {
     let meme = await dbService.doc(`User Data/${ia.user.id}`).get();
-    if (ia.isButton) {
+    if (ia.isChatInputCommand()) {
+        const command = ia.client.commands.get(ia.commandName);
+        if (!command) {
+            console.error(`No matching command ${ia.commandName} was found.`)
+        }
+        try {
+            if (!meme.exists && ia.commandName !== "initialize") {
+                await ia.reply("Please run the command /initialize to open your account first.")
+            } else {
+                await command.execute(ia, meme)   
+            }
+        } catch (error) {
+            console.error(error);
+            await ia.reply("An error happened while executing this command.")
+        }
+    }
+    if (ia.isButton()) {
+        switch (ia.customId) {
+            case "rspAccept":
+            case "rspDecline":
+                if (ia.user.id == ia.message.mentions.users.first().id) {
+                    if (ia.customId == "rspAccept") {
+                        const actionRow = new ActionRowBuilder().addComponents(new ButtonBuilder().setLabel("Choose").setCustomId("rspChoose").setStyle(ButtonStyle.Secondary))
+                        ia.reply({content: `${ia.user.username} accepted the challenge. ${ia.user} and ${ia.message.mentions.users.at(1)}, please click the button below to choose. You have 10 seconds.`, components: [actionRow]})
+                        setTimeout(async () => {
+                            await dbService.collection(`${ia.message.mentions.users.first().id}${ia.message.mentions.users.at(1).id}`).get().then(async doc => {
+                                let a = 0
+                                doc.forEach(async () => {
+                                    a = a + 1
+                                })
+                                if (a == 3) {
+                                    await dbService.doc(`${ia.message.mentions.users.first().id}${ia.message.mentions.users.at(1).id}/${ia.message.mentions.users.first().id}`).get().then(async first => {
+                                        await dbService.doc(`${ia.message.mentions.users.first().id}${ia.message.mentions.users.at(1).id}/${ia.message.mentions.users.at(1).id}`).get().then(async second => {
+                                            await dbService.doc(`${ia.message.mentions.users.first().id}${ia.message.mentions.users.at(1).id}/bet`).get().then(async bet => {
+                                                await dbService.doc(`User Data/${ia.message.mentions.users.first().id}`).get().then(async firstBal => {
+                                                    await dbService.doc(`User Data/${ia.message.mentions.users.at(1).id}`).get().then(async secondBal => {
+                                                        const firstPlayer = ia.message.mentions.users.first().username;
+                                                        const secondPlayer = ia.message.mentions.users.at(1).username;
+                                                        const firstMove = first.data().move;
+                                                        const secondMove = second.data().move;
+                                                        if (firstMove == secondMove) {
+                                                            const embed = new EmbedBuilder().setTitle(`${ia.message.mentions.users.first().username} and ${ia.message.mentions.users.at(1).username}'s RSP Game Results:`).setDescription(`
+                                                            ${firstPlayer}'s move: ${first.data().move}
+                                                            ${secondPlayer}'s move: ${second.data().move}
+
+                                                            The game between ${firstPlayer} and ${secondPlayer} ended in a draw.
+                                                            `)
+                                                            await ia.channel.send({embeds: [embed]})
+                                                        } else if (firstMove == "scissors") {
+                                                            if (secondMove == "paper") {
+                                                                const embed = new EmbedBuilder().setTitle(`${ia.message.mentions.users.first().username} and ${ia.message.mentions.users.at(1).username}'s RSP Game Results:`).setDescription(`
+                                                            ${ia.message.mentions.users.first().username}'s move: ${first.data().move}
+                                                            ${ia.message.mentions.users.at(1).username}'s move: ${second.data().move}
+
+                                                            ${firstPlayer} won! ${secondPlayer} gave ${firstPlayer} ${bet.data().bet}
+                                                        `)
+                                                        dbService.doc(`User Data/${ia.message.mentions.users.first().id}`).update({
+                                                            wallet: firstBal.data().wallet + bet.data().bet
+                                                        })
+                                                        dbService.doc(`User Data/${ia.message.mentions.users.at(1).id}`).update({
+                                                            wallet: secondBal.data().wallet - bet.data().bet
+                                                        })
+                                                        await ia.channel.send({embeds: [embed]})
+                                                            } else {
+                                                                const embed = new EmbedBuilder().setTitle(`${ia.message.mentions.users.first().username} and ${ia.message.mentions.users.at(1).username}'s RSP Game Results:`).setDescription(`
+                                                            ${ia.message.mentions.users.first().username}'s move: ${first.data().move}
+                                                            ${ia.message.mentions.users.at(1).username}'s move: ${second.data().move}
+
+                                                            ${secondPlayer} won! ${firstPlayer} gave ${secondPlayer} ${bet.data().bet}
+                                                        `)
+                                                        dbService.doc(`User Data/${ia.message.mentions.users.first().id}`).update({
+                                                            wallet: firstBal.data().wallet - bet.data().bet
+                                                        })
+                                                        dbService.doc(`User Data/${ia.message.mentions.users.at(1).id}`).update({
+                                                            wallet: secondBal.data().wallet + bet.data().bet
+                                                        })
+                                                        await ia.channel.send({embeds: [embed]})
+                                                            }
+                                                        } else if (firstMove == "paper") {
+                                                            if (secondMove == "rock") {
+                                                                const embed = new EmbedBuilder().setTitle(`${ia.message.mentions.users.first().username} and ${ia.message.mentions.users.at(1).username}'s RSP Game Results:`).setDescription(`
+                                                            ${firstPlayer}'s move: ${first.data().move}
+                                                            ${secondPlayer}'s move: ${second.data().move}
+
+                                                            ${firstPlayer} won! ${secondPlayer} gave ${firstPlayer} ${bet.data().bet}
+                                                        `)
+                                                        dbService.doc(`User Data/${ia.message.mentions.users.first().id}`).update({
+                                                            wallet: firstBal.data().wallet + bet.data().bet
+                                                        })
+                                                        dbService.doc(`User Data/${ia.message.mentions.users.at(1).id}`).update({
+                                                            wallet: secondBal.data().wallet - bet.data().bet
+                                                        })
+                                                        await ia.channel.send({embeds: [embed]})
+                                                            } else {
+                                                                const embed = new EmbedBuilder().setTitle(`${ia.message.mentions.users.first().username} and ${ia.message.mentions.users.at(1).username}'s RSP Game Results:`).setDescription(`
+                                                            ${ia.message.mentions.users.first().username}'s move: ${first.data().move}
+                                                            ${ia.message.mentions.users.at(1).username}'s move: ${second.data().move}
+
+                                                            ${secondPlayer} won! ${firstPlayer} gave ${secondPlayer} ${bet.data().bet}
+                                                        `)
+                                                        dbService.doc(`User Data/${ia.message.mentions.users.first().id}`).update({
+                                                            wallet: firstBal.data().wallet - bet.data().bet
+                                                        })
+                                                        dbService.doc(`User Data/${ia.message.mentions.users.at(1).id}`).update({
+                                                            wallet: secondBal.data().wallet + bet.data().bet
+                                                        })
+                                                        await ia.channel.send({embeds: [embed]})
+                                                            }
+                                                        } else {
+                                                            if (secondMove == "scissors") {
+                                                                const embed = new EmbedBuilder().setTitle(`${ia.message.mentions.users.first().username} and ${ia.message.mentions.users.at(1).username}'s RSP Game Results:`).setDescription(`
+                                                            ${ia.message.mentions.users.first().username}'s move: ${first.data().move}
+                                                            ${ia.message.mentions.users.at(1).username}'s move: ${second.data().move}
+
+                                                            ${firstPlayer} won! ${secondPlayer} gave ${firstPlayer} ${bet.data().bet}
+                                                        `)
+                                                        dbService.doc(`User Data/${ia.message.mentions.users.first().id}`).update({
+                                                            wallet: firstBal.data().wallet + bet.data().bet
+                                                        })
+                                                        dbService.doc(`User Data/${ia.message.mentions.users.at(1).id}`).update({
+                                                            wallet: secondBal.data().wallet - bet.data().bet
+                                                        })
+                                                        await ia.channel.send({embeds: [embed]})
+                                                            } else {
+                                                                const embed = new EmbedBuilder().setTitle(`${ia.message.mentions.users.first().username} and ${ia.message.mentions.users.at(1).username}'s RSP Game Results:`).setDescription(`
+                                                            ${ia.message.mentions.users.first().username}'s move: ${first.data().move}
+                                                            ${ia.message.mentions.users.at(1).username}'s move: ${second.data().move}
+
+                                                            ${secondPlayer} won! ${firstPlayer} gave ${secondPlayer} ${bet.data().bet}
+                                                        `)
+                                                        dbService.doc(`User Data/${ia.message.mentions.users.first().id}`).update({
+                                                            wallet: firstBal.data().wallet - bet.data().bet
+                                                        })
+                                                        dbService.doc(`User Data/${ia.message.mentions.users.at(1).id}`).update({
+                                                            wallet: secondBal.data().wallet + bet.data().bet
+                                                        })
+                                                        await ia.channel.send({embeds: [embed]})
+                                                            }
+                                                        }
+                                                    })
+                                                })
+                                            })
+                                        })
+                                    })
+                                } else {
+                                    await ia.editReply({content: `10 seconds ended, but not all the players chose.`})
+                                }
+                            })
+                        }, 10000)
+                    } else if (ia.customId == "rspDecline") {
+                        ia.reply({content: `${ia.user.username} declined the challenge.`, components: []})
+                    }
+                    await dbService.doc(`${ia.message.mentions.users.first().id}${ia.message.mentions.users.at(1).id}/${ia.message.mentions.users.first().id}`).delete()
+                    await dbService.doc(`${ia.message.mentions.users.first().id}${ia.message.mentions.users.at(1).id}/${ia.message.mentions.users.at(1).id}`).delete()
+                    await dbService.doc(`${ia.message.mentions.users.first().id}${ia.message.mentions.users.at(1).id}/bet`).delete()
+                } else {
+                    ia.reply({content: "That offer was not for you.", ephemeral: true})
+                }
+                break;
+            case "rspChoose":
+                if (ia.user.id == ia.message.mentions.users.first().id || ia.message.mentions.users.at(1).id) {
+                    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setLabel("Rock").setCustomId("rock").setStyle(ButtonStyle.Primary), new ButtonBuilder().setLabel("Scissors").setCustomId("scissors").setStyle(ButtonStyle.Primary), new ButtonBuilder().setLabel("Paper").setCustomId("paper").setStyle(ButtonStyle.Primary))
+                    ia.reply({content: "Please choose between the three:", components: [row], ephemeral: true})
+                } else {
+                    ia.reply({content: "You're not in the game.", ephemeral: true})
+                }
+                break;
+            case "rock":
+            case "paper":
+            case "scissors":
+                const ogMessage = await ia.message.fetchReference();
+                try {
+                    dbService.doc(`${ogMessage.mentions.users.first().id}${ogMessage.mentions.users.at(1).id}/${ia.user.id}`).set({
+                        move: ia.customId
+                    })
+                } catch (err) {
+                    console.error(err)
+                }
+                ia.reply({content: "Thank you for choosing.", ephemeral: true})
+                break;
+            case "odd":
+            case "even":
+                if (ia.message.mentions.users.first().id == ia.user.id) {
+                    const randomNumber = Math.floor(Math.random() * 99) + 1;
+                    await dbService.doc(`oddeven/${ia.user.id}`).get().then(async doc => {
+                        if (ia.customId == "odd") {
+                            if (randomNumber % 2 == 0) {
+                                dbService.doc(`User Data/${ia.user.id}`).update({
+                                    wallet: meme.data().wallet - doc.data().bet
+                                })
+                                const embed = new EmbedBuilder().setTitle(`${ia.user.username}'s Oddeven Game Result:`).setDescription(`
+                                Your choice: ${ia.customId}
+                                Resulting Number: ${randomNumber}
+
+                                You lost! You lost ${doc.data().bet}
+                                `)
+                                await ia.reply({embeds: [embed]})
+                            } else {
+                                dbService.doc(`User Data/${ia.user.id}`).update({
+                                    wallet: meme.data().wallet + doc.data().bet
+                                })
+                                const embed = new EmbedBuilder().setTitle(`${ia.user.username}'s Oddeven Game Result:`).setDescription(`
+                                Your choice: ${ia.customId}
+                                Resulting Number: ${randomNumber}
+
+                                You won! You won ${doc.data().bet}
+                                `)
+                                await ia.reply({embeds: [embed]})
+                            }
+                        } else {
+                            if (randomNumber % 2 == 1) {
+                                dbService.doc(`User Data/${ia.user.id}`).update({
+                                    wallet: meme.data().wallet - doc.data().bet
+                                })
+                                const embed = new EmbedBuilder().setTitle(`${ia.user.username}'s Oddeven Game Result:`).setDescription(`
+                                Your choice: ${ia.customId}
+                                Resulting Number: ${randomNumber}
+
+                                You lost! You lost ${doc.data().bet}
+                                `)
+                                await ia.reply({embeds: [embed]})
+                            } else {
+                                dbService.doc(`User Data/${ia.user.id}`).update({
+                                    wallet: meme.data().wallet + doc.data().bet
+                                })
+                                const embed = new EmbedBuilder().setTitle(`${ia.user.username}'s Oddeven Game Result:`).setDescription(`
+                                Your choice: ${ia.customId}
+                                Resulting Number: ${randomNumber}
+
+                                You won! You won ${doc.data().bet}
+                                `)
+                                await ia.reply({embeds: [embed]})
+                            }
+                        }
+                        dbService.doc(`oddeven/${ia.user.id}`).delete();
+                    })
+                } else {
+                    await ia.reply({content: "This is not your game. Run the command yourself.", ephemeral: true})
+                }
+                break;
+        }
         if (rr.has(ia.user.id)) {
             if (ia.customId == "rr_1_yes") {
                 const random = Math.floor(Math.random() * 6) + 1;
@@ -384,7 +641,8 @@ client.on("interactionCreate", async (ia) => {
     }
 })
 
-client.on("messageCreate", async (message) => {
+/* client.on('interactionCreate', async (message) => {
+    console.log(message.channelId)
     const database = clienta.db("economyBot");
     const stock = database.collection("stock market")
     let meme = await dbService.doc(`User Data/${message.author.id}`).get();
@@ -1369,6 +1627,28 @@ Bank: ${doc.data().bank}
 .setTimestamp()
 .setColor("BLUE")
                     message.channel.send({embeds:[ddd]})
+                } else if (command == "trade") {
+                    if (args[2] && args[3] && args[4]) {
+                        if (args[2] == "life") {
+                            if (parseInt(args[3]) && parseInt(args[4])) {
+                                if (parseInt(args[3]) <= meme.data().life) {
+                                    if (parseInt(args[4]) <= doc.data().wallet) {
+                                        const start = "<@"
+                                        const asdf = new MessageEmbed().setTitle("Trade opened by " + message.author.username + ":").setDescription("asdf")
+                                        message.channel.send({content: start.concat(message.author.id, ">") + " opened a trade with " + start.concat(message.mentions.users.first().id, ">"), embeds: [asdf], components: [{type: 1, components: [{type: 2, custom_id: "tradeYes", label: "Confirm"}, {type: 2, custom_id: "tradeNo", label: "Cancel"}]}]})
+                                    } else {
+                                        message.reply("The person you're trading with doesn't have that much money in his/her wallet." + parseInt(args[4]) + doc.data().wallet)
+                                    }
+                                } else {
+                                    message.reply("You don't have that many life savers to trade with.")
+                                }
+                            } else {
+                                message.reply("The quantity and the price have to be numbers.")
+                            }
+                        } else {
+                            message.reply('The item "' + args[2] + '" does not exist.')
+                        }
+                    }
                 } else if (command == "give") {
                     if (args[2]) {
                         if (parseInt(args[2])) {
@@ -1456,6 +1736,6 @@ Bank: ${doc.data().bank}
             })
         }
     }
-});
+}); */
 
-client.login("OTA0MTY4MDY0OTM1OTQ4MzI5.GEQjdu.QSEgXW6yVxlGSdXP__dCgABFEFcMKsZ6BBzp5o");
+client.login("OTA0MTY4MDY0OTM1OTQ4MzI5.Gr_CmH.jQFTFa2GfwIcunkGgQiuwsV9OI7OJoxA_yvKXg");
