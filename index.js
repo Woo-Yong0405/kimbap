@@ -1,7 +1,7 @@
 const { Client, MessageEmbed, Intents, GatewayIntentBits, Events, Collection, ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } = require("discord.js");
 const client = new Client({intents:[GatewayIntentBits.Guilds]});
 const fb = require("./fb");
-require("dotenv").config()
+const { token } = require('./config.json');
 
 const fs = require("node:fs");
 const path = require("node:path");
@@ -1739,4 +1739,4 @@ Bank: ${doc.data().bank}
     }
 }); */
 
-client.login("OTA0MTY4MDY0OTM1OTQ4MzI5.GksWvI.vbBOroKws4UMN4dRDtT8gN8cX4gSAj7xOP_khU");
+client.login(token);
