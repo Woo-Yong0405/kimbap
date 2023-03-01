@@ -6,7 +6,7 @@ module.exports = {
     async execute(interaction) {
         await dbService.doc(`User Data/${interaction.user.id}`).get().then(async doc => {
             if (doc.exists) {
-                await interaction.reply(`${interaction.user.username}'s account already exists.`)
+                await interaction.reply(`${interaction.user.username}'s account already exists.`);
             } else {
                 dbService.doc(`User Data/${interaction.user.id}`).set({
                     bank: 0,
