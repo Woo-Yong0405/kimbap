@@ -2,7 +2,7 @@ const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = re
 const dbService = require("../fb");
 
 module.exports = {
-    data: new SlashCommandBuilder().setName("rsp").setDescription("Play rock scissors paper against another user!").addIntegerOption(option => option.setName("amount").setDescription("Amount of bet").setRequired(true)).addUserOption(option => option.setName("opponent").setDescription("Who you're playing against").setRequired(true)),
+    data: new SlashCommandBuilder().setName("가위바위보").setDescription("다른 유저와 돈걸고 가위바위보를 하기").addIntegerOption(option => option.setName("금액").setRequired(true)).addUserOption(option => option.setName("opponent").setDescription("Who you're playing against").setRequired(true)),
     async execute(message, meme) {
         if (message.options.getInteger("amount") > meme.data().wallet) {
             await message.reply("You don't have enough money in your wallet.");

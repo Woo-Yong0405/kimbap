@@ -91,6 +91,7 @@ client.once(Events.ClientReady, () => {
         clienta.connect()
         console.log("Database Connection Reset")
     }, 1800000)
+    console.log(client.user.id)
 });
 
 client.on(Events.InteractionCreate, async (ia) => {
@@ -1738,4 +1739,4 @@ Bank: ${doc.data().bank}
     }
 }); */
 
-client.login("OTA0MTY4MDY0OTM1OTQ4MzI5.Gr_CmH.jQFTFa2GfwIcunkGgQiuwsV9OI7OJoxA_yvKXg");
+client.login("OTA0MTY4MDY0OTM1OTQ4MzI5.GksWvI.vbBOroKws4UMN4dRDtT8gN8cX4gSAj7xOP_khU");

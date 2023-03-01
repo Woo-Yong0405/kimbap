@@ -4,7 +4,7 @@ const dbService = require("../fb");
 const tips = new Set();
 
 module.exports = {
-    data: new SlashCommandBuilder().setName("tips").setDescription("Collect tips to earn money!"),
+    data: new SlashCommandBuilder().setName("팁").setDescription("팁으로 돈벌기"),
     async execute(message, meme) {
         if (tips.has(message.user.id)) {
             message.reply("Your cooldown hasn't ended yet.")

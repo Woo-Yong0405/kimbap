@@ -2,7 +2,7 @@ const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 const dbService = require("../fb");
 
 module.exports = {
-    data: new SlashCommandBuilder().setName("balance").setDescription("Check how much money you have!").addUserOption(option => option.setName("user").setDescription("View user's balance")),
+    data: new SlashCommandBuilder().setName("잔고").setDescription("잔고 확인").addUserOption(option => option.setName("유저")),
     async execute(interaction) {
         const user = interaction.options.getUser("user") ?? interaction.user;
         let meme = await dbService.collection("User Data").doc(user.id).get()

@@ -3,7 +3,7 @@ const { SlashCommandBuilder, ButtonStyle } = require("discord.js");
 const dbService = require("../fb");
 
 module.exports = {
-    data: new SlashCommandBuilder().setName("oddeven").setDescription("Bet money on whether the number will be odd or even!").addIntegerOption(option => option.setName("bet").setDescription("Amount of money to bet").setRequired(true)),
+    data: new SlashCommandBuilder().setName("홀짝").setDescription("홀짝게임을 이용한 도박").addIntegerOption(option => option.setName("금액").setRequired(true)),
     async execute(interaction, userDB) {
         if (interaction.options.getInteger("bet") > userDB.data().wallet) {
             interaction.reply("You don't have enough money.")

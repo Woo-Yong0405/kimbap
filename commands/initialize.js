@@ -2,7 +2,7 @@ const { SlashCommandBuilder } = require("discord.js");
 const dbService = require("../fb");
 
 module.exports = {
-    data: new SlashCommandBuilder().setName("initialize").setDescription("Initialize your balance if you're new!"),
+    data: new SlashCommandBuilder().setName("셋업").setDescription("신규유저용"),
     async execute(interaction) {
         await dbService.doc(`User Data/${interaction.user.id}`).get().then(async doc => {
             if (doc.exists) {
