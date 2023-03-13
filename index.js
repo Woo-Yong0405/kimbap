@@ -1,4 +1,4 @@
-const { Client, MessageEmbed, Intents, GatewayIntentBits, Events, Collection, ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } = require("discord.js");
+const { Client, GatewayIntentBits, Events, Collection, EmbedBuilder } = require("discord.js");
 const client = new Client({intents:[GatewayIntentBits.Guilds]});
 const fb = require("./fb");
 const { token } = require('./config.json');
