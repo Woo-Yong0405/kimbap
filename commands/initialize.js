@@ -15,6 +15,5 @@ module.exports = {
                 await interaction.reply(`${interaction.user.username}'s account has been initialized. Congratulations!`)
             }
         })
-        
     }
 }

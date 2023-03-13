@@ -114,167 +114,98 @@ client.on(Events.InteractionCreate, async (ia) => {
     }
     if (ia.isButton()) {
         switch (ia.customId) {
-            case "rspAccept":
-            case "rspDecline":
-                if (ia.user.id == ia.message.mentions.users.first().id) {
-                    if (ia.customId == "rspAccept") {
-                        const actionRow = new ActionRowBuilder().addComponents(new ButtonBuilder().setLabel("Choose").setCustomId("rspChoose").setStyle(ButtonStyle.Secondary))
-                        ia.reply({content: `${ia.user.username} accepted the challenge. ${ia.user} and ${ia.message.mentions.users.at(1)}, please click the button below to choose. You have 10 seconds.`, components: [actionRow]})
-                        setTimeout(async () => {
-                            await dbService.collection(`${ia.message.mentions.users.first().id}${ia.message.mentions.users.at(1).id}`).get().then(async doc => {
-                                let a = 0
-                                doc.forEach(async () => {
+            case "rock":
+            case "scissors":
+            case "paper":
+                if (ia.message.mentions.users.first().id == ia.user.id || ia.message.mentions.users.at(1).id == ia.user.id) {
+                    dbService.doc(`${ia.message.mentions.users.first().id}${ia.message.mentions.users.at(1)}/${ia.user.id}`).get().then((doc) => {
+                        if (doc.exists) {
+                            ia.reply({content: "You already chose!", ephemeral: true})
+                        } else {
+                            dbService.doc(`${ia.message.mentions.users.first().id}${ia.message.mentions.users.at(1)}/${ia.user.id}`).set({
+                                choice: ia.customId
+                            })
+                            ia.reply({content: `You chose: ${ia.customId}`, ephemeral: true})
+                            dbService.collection(`${ia.message.mentions.users.first().id}${ia.message.mentions.users.at(1)}`).get().then(snapshot => {
+                                let a = 0;
+                                snapshot.forEach(() => {
                                     a = a + 1
-                                })
-                                if (a == 3) {
-                                    await dbService.doc(`${ia.message.mentions.users.first().id}${ia.message.mentions.users.at(1).id}/${ia.message.mentions.users.first().id}`).get().then(async first => {
-                                        await dbService.doc(`${ia.message.mentions.users.first().id}${ia.message.mentions.users.at(1).id}/${ia.message.mentions.users.at(1).id}`).get().then(async second => {
-                                            await dbService.doc(`${ia.message.mentions.users.first().id}${ia.message.mentions.users.at(1).id}/bet`).get().then(async bet => {
-                                                await dbService.doc(`User Data/${ia.message.mentions.users.first().id}`).get().then(async firstBal => {
-                                                    await dbService.doc(`User Data/${ia.message.mentions.users.at(1).id}`).get().then(async secondBal => {
-                                                        const firstPlayer = ia.message.mentions.users.first().username;
-                                                        const secondPlayer = ia.message.mentions.users.at(1).username;
-                                                        const firstMove = first.data().move;
-                                                        const secondMove = second.data().move;
-                                                        if (firstMove == secondMove) {
-                                                            const embed = new EmbedBuilder().setTitle(`${ia.message.mentions.users.first().username} and ${ia.message.mentions.users.at(1).username}'s RSP Game Results:`).setDescription(`
-                                                            ${firstPlayer}'s move: ${first.data().move}
-                                                            ${secondPlayer}'s move: ${second.data().move}
-
-                                                            The game between ${firstPlayer} and ${secondPlayer} ended in a draw.
-                                                            `)
-                                                            await ia.channel.send({embeds: [embed]})
-                                                        } else if (firstMove == "scissors") {
-                                                            if (secondMove == "paper") {
-                                                                const embed = new EmbedBuilder().setTitle(`${ia.message.mentions.users.first().username} and ${ia.message.mentions.users.at(1).username}'s RSP Game Results:`).setDescription(`
-                                                            ${ia.message.mentions.users.first().username}'s move: ${first.data().move}
-                                                            ${ia.message.mentions.users.at(1).username}'s move: ${second.data().move}
-
-                                                            ${firstPlayer} won! ${secondPlayer} gave ${firstPlayer} ${bet.data().bet}
+                                }).then(() => {
+                                    if (a = 2) {
+                                        let result;
+                                        const firstperson = ia.message.mentions.users.first()
+                                        const secondperson = ia.message.mentions.users.at(1)
+                                        dbService.doc(`${firstperson.id}${secondperson.id}/${firstperson}`).get().then(firstdoc => {
+                                            dbService.doc(`${firstperson.id}${secondperson.id}/${secondperson}`).get().then(seconddoc => {
+                                                const firstchoice = firstdoc.data().choice
+                                                const secondchoice = seconddoc.data().choice
+                                                if (firstchoice == "rock") {
+                                                    switch (secondchoice) {
+                                                        case "rock":
+                                                            result = "draw"
+                                                        case "scissors":
+                                                            result = "first"
+                                                        case "paper":
+                                                            result = "second"
+                                                    }
+                                                } else if (firstchoice == "scissors") {
+                                                    switch (secondchoice) {
+                                                        case "rock":
+                                                            result = "second"
+                                                        case "scissors":
+                                                            result = "draw"
+                                                        case "paper":
+                                                            result = "first"
+                                                    }
+                                                } else {
+                                                    switch (secondchoice) {
+                                                        case "rock":
+                                                            result = "first"
+                                                        case "scissors":
+                                                            result = "second"
+                                                        case "paper":
+                                                            result = "draw"
+                                                    }
+                                                }
+                                                dbService.doc(`${firstperson.id}${secondperson.id}/bet`).get().then(doca => {
+                                                    if (result == "first") {
+                                                        const embed = new EmbedBuilder().setTitle(`Results between ${firstperson.username} and ${secondperson.username}:`).setDescription(`
+                                                        ${firstperson.username}: ${firstchoice}
+                                                        ${secondperson.username}: ${secondchoice}
+    
+                                                        ${firstperson.username} won ${doca.data().bet}
                                                         `)
-                                                        dbService.doc(`User Data/${ia.message.mentions.users.first().id}`).update({
-                                                            wallet: firstBal.data().wallet + bet.data().bet
-                                                        })
-                                                        dbService.doc(`User Data/${ia.message.mentions.users.at(1).id}`).update({
-                                                            wallet: secondBal.data().wallet - bet.data().bet
-                                                        })
-                                                        await ia.channel.send({embeds: [embed]})
-                                                            } else {
-                                                                const embed = new EmbedBuilder().setTitle(`${ia.message.mentions.users.first().username} and ${ia.message.mentions.users.at(1).username}'s RSP Game Results:`).setDescription(`
-                                                            ${ia.message.mentions.users.first().username}'s move: ${first.data().move}
-                                                            ${ia.message.mentions.users.at(1).username}'s move: ${second.data().move}
-
-                                                            ${secondPlayer} won! ${firstPlayer} gave ${secondPlayer} ${bet.data().bet}
+                                                        ia.reply({embeds: [embed]})
+                                                    } else if (result == "second") {
+                                                        const embed = new EmbedBuilder().setTitle(`Results between ${firstperson.username} and ${secondperson.username}:`).setDescription(`
+                                                        ${firstperson.username}: ${firstchoice}
+                                                        ${secondperson.username}: ${secondchoice}
+    
+                                                        ${secondperson.username} won ${doca.data().bet}
                                                         `)
-                                                        dbService.doc(`User Data/${ia.message.mentions.users.first().id}`).update({
-                                                            wallet: firstBal.data().wallet - bet.data().bet
-                                                        })
-                                                        dbService.doc(`User Data/${ia.message.mentions.users.at(1).id}`).update({
-                                                            wallet: secondBal.data().wallet + bet.data().bet
-                                                        })
-                                                        await ia.channel.send({embeds: [embed]})
-                                                            }
-                                                        } else if (firstMove == "paper") {
-                                                            if (secondMove == "rock") {
-                                                                const embed = new EmbedBuilder().setTitle(`${ia.message.mentions.users.first().username} and ${ia.message.mentions.users.at(1).username}'s RSP Game Results:`).setDescription(`
-                                                            ${firstPlayer}'s move: ${first.data().move}
-                                                            ${secondPlayer}'s move: ${second.data().move}
-
-                                                            ${firstPlayer} won! ${secondPlayer} gave ${firstPlayer} ${bet.data().bet}
+                                                        ia.reply({embeds: [embed]})
+                                                    } else if (result == "draw") {
+                                                        const embed = new EmbedBuilder().setTitle(`Results between ${firstperson.username} and ${secondperson.username}:`).setDescription(`
+                                                        ${firstperson.username}: ${firstchoice}
+                                                        ${secondperson.username}: ${secondchoice}
+    
+                                                        This is a draw.
                                                         `)
-                                                        dbService.doc(`User Data/${ia.message.mentions.users.first().id}`).update({
-                                                            wallet: firstBal.data().wallet + bet.data().bet
-                                                        })
-                                                        dbService.doc(`User Data/${ia.message.mentions.users.at(1).id}`).update({
-                                                            wallet: secondBal.data().wallet - bet.data().bet
-                                                        })
-                                                        await ia.channel.send({embeds: [embed]})
-                                                            } else {
-                                                                const embed = new EmbedBuilder().setTitle(`${ia.message.mentions.users.first().username} and ${ia.message.mentions.users.at(1).username}'s RSP Game Results:`).setDescription(`
-                                                            ${ia.message.mentions.users.first().username}'s move: ${first.data().move}
-                                                            ${ia.message.mentions.users.at(1).username}'s move: ${second.data().move}
-
-                                                            ${secondPlayer} won! ${firstPlayer} gave ${secondPlayer} ${bet.data().bet}
-                                                        `)
-                                                        dbService.doc(`User Data/${ia.message.mentions.users.first().id}`).update({
-                                                            wallet: firstBal.data().wallet - bet.data().bet
-                                                        })
-                                                        dbService.doc(`User Data/${ia.message.mentions.users.at(1).id}`).update({
-                                                            wallet: secondBal.data().wallet + bet.data().bet
-                                                        })
-                                                        await ia.channel.send({embeds: [embed]})
-                                                            }
-                                                        } else {
-                                                            if (secondMove == "scissors") {
-                                                                const embed = new EmbedBuilder().setTitle(`${ia.message.mentions.users.first().username} and ${ia.message.mentions.users.at(1).username}'s RSP Game Results:`).setDescription(`
-                                                            ${ia.message.mentions.users.first().username}'s move: ${first.data().move}
-                                                            ${ia.message.mentions.users.at(1).username}'s move: ${second.data().move}
-
-                                                            ${firstPlayer} won! ${secondPlayer} gave ${firstPlayer} ${bet.data().bet}
-                                                        `)
-                                                        dbService.doc(`User Data/${ia.message.mentions.users.first().id}`).update({
-                                                            wallet: firstBal.data().wallet + bet.data().bet
-                                                        })
-                                                        dbService.doc(`User Data/${ia.message.mentions.users.at(1).id}`).update({
-                                                            wallet: secondBal.data().wallet - bet.data().bet
-                                                        })
-                                                        await ia.channel.send({embeds: [embed]})
-                                                            } else {
-                                                                const embed = new EmbedBuilder().setTitle(`${ia.message.mentions.users.first().username} and ${ia.message.mentions.users.at(1).username}'s RSP Game Results:`).setDescription(`
-                                                            ${ia.message.mentions.users.first().username}'s move: ${first.data().move}
-                                                            ${ia.message.mentions.users.at(1).username}'s move: ${second.data().move}
-
-                                                            ${secondPlayer} won! ${firstPlayer} gave ${secondPlayer} ${bet.data().bet}
-                                                        `)
-                                                        dbService.doc(`User Data/${ia.message.mentions.users.first().id}`).update({
-                                                            wallet: firstBal.data().wallet - bet.data().bet
-                                                        })
-                                                        dbService.doc(`User Data/${ia.message.mentions.users.at(1).id}`).update({
-                                                            wallet: secondBal.data().wallet + bet.data().bet
-                                                        })
-                                                        await ia.channel.send({embeds: [embed]})
-                                                            }
-                                                        }
-                                                    })
+                                                        ia.reply({embeds: [embed]})
+                                                    } else {
+                                                        console.error("didn't work fuck you")
+                                                    }
                                                 })
                                             })
                                         })
-                                    })
-                                } else {
-                                    await ia.editReply({content: `10 seconds ended, but not all the players chose.`})
-                                }
+                                    }
+                                })
                             })
-                        }, 10000)
-                    } else if (ia.customId == "rspDecline") {
-                        ia.reply({content: `${ia.user.username} declined the challenge.`, components: []})
-                    }
-                    await dbService.doc(`${ia.message.mentions.users.first().id}${ia.message.mentions.users.at(1).id}/${ia.message.mentions.users.first().id}`).delete()
-                    await dbService.doc(`${ia.message.mentions.users.first().id}${ia.message.mentions.users.at(1).id}/${ia.message.mentions.users.at(1).id}`).delete()
-                    await dbService.doc(`${ia.message.mentions.users.first().id}${ia.message.mentions.users.at(1).id}/bet`).delete()
-                } else {
-                    ia.reply({content: "That offer was not for you.", ephemeral: true})
-                }
-                break;
-            case "rspChoose":
-                if (ia.user.id == ia.message.mentions.users.first().id || ia.message.mentions.users.at(1).id) {
-                    const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setLabel("Rock").setCustomId("rock").setStyle(ButtonStyle.Primary), new ButtonBuilder().setLabel("Scissors").setCustomId("scissors").setStyle(ButtonStyle.Primary), new ButtonBuilder().setLabel("Paper").setCustomId("paper").setStyle(ButtonStyle.Primary))
-                    ia.reply({content: "Please choose between the three:", components: [row], ephemeral: true})
-                } else {
-                    ia.reply({content: "You're not in the game.", ephemeral: true})
-                }
-                break;
-            case "rock":
-            case "paper":
-            case "scissors":
-                const ogMessage = await ia.message.fetchReference();
-                try {
-                    dbService.doc(`${ogMessage.mentions.users.first().id}${ogMessage.mentions.users.at(1).id}/${ia.user.id}`).set({
-                        move: ia.customId
+                        }
                     })
-                } catch (err) {
-                    console.error(err)
+                } else {
+                    ia.reply({content: "You're not in this game!", ephemeral: true})
                 }
-                ia.reply({content: "Thank you for choosing.", ephemeral: true})
                 break;
             case "odd":
             case "even":
