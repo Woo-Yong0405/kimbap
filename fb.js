@@ -1,5 +1,6 @@
-const firebase = require("firebase");
+const firebase = require("firebase/app");
 const asdf = require("./token.json");
+require("firebase/firestore")
 
 firebase.initializeApp({
     apiKey: asdf.API_KEY,

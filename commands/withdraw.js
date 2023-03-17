@@ -4,7 +4,7 @@ const dbService = require("../fb");
 module.exports = {
     data: new SlashCommandBuilder().setName("출금").setDescription("은행에서 돈빼기").addIntegerOption(option => option.setName("금액").setDescription("출금 금액").setRequired(true)),
     async execute(message, meme) {
-        await dbService.doc(`User Data/${message.user.id}`).then(async (doc) => {
+        await dbService.doc(`User Data/${message.user.id}`).get().then(async (doc) => {
             if (doc.exists) {
                 const amount = message.options.getInteger("amount")
                 if(parseInt(amount) > meme.data().bank) {

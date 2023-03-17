@@ -223,7 +223,7 @@ client.on(Events.InteractionCreate, async (ia) => {
 
                                 You lost! You lost ${doc.data().bet}
                                 `)
-                                await ia.reply({embeds: [embed]})
+                                await ia.message.edit({embeds: [embed]})
                             } else {
                                 dbService.doc(`User Data/${ia.user.id}`).update({
                                     wallet: meme.data().wallet + doc.data().bet
@@ -234,7 +234,7 @@ client.on(Events.InteractionCreate, async (ia) => {
 
                                 You won! You won ${doc.data().bet}
                                 `)
-                                await ia.reply({embeds: [embed]})
+                                await ia.message.edit({embeds: [embed]})
                             }
                         } else {
                             if (randomNumber % 2 == 1) {
@@ -247,7 +247,7 @@ client.on(Events.InteractionCreate, async (ia) => {
 
                                 You lost! You lost ${doc.data().bet}
                                 `)
-                                await ia.reply({embeds: [embed]})
+                                await ia.message.edit({embeds: [embed]})
                             } else {
                                 dbService.doc(`User Data/${ia.user.id}`).update({
                                     wallet: meme.data().wallet + doc.data().bet
@@ -258,13 +258,45 @@ client.on(Events.InteractionCreate, async (ia) => {
 
                                 You won! You won ${doc.data().bet}
                                 `)
-                                await ia.reply({embeds: [embed]})
+                                await ia.message.edit({embeds: [embed]})
                             }
                         }
                         dbService.doc(`oddeven/${ia.user.id}`).delete();
                     })
                 } else {
                     await ia.reply({content: "This is not your game. Run the command yourself.", ephemeral: true})
+                }
+                break;
+            case "sendconfirm":
+            case "sendcancel":
+                if (ia.message.mentions.users.first().id == ia.user.id) {
+                    if (ia.customId == "sendconfirm") {
+                        dbService.doc(`send/${ia.user.id}`).get().then(doc => {
+                            dbService.doc(`User Data/${ia.user.id}`).get().then(userdata => {
+                                dbService.doc(`User Data/${doc.data().to}`).get().then(buserdata => {
+                                    dbService.doc(`User Data/${ia.user.id}`).set({
+                                        wallet: userdata.data().wallet - doc.data().amount,
+                                        bank: userdata.data().bank
+                                    }).then(() => {
+                                        dbService.doc(`User Data/${doc.data().to}`).set({
+                                            wallet: buserdata.data().wallet + doc.data().amount,
+                                            bank: buserdata.data().bank
+                                        }).then(() => {
+                                            const kid = client.users.cache.get(doc.data().to)
+                                            ia.message.edit({content: `${ia.user} successfully sent ${kid} ${doc.data().amount}`})
+                                            dbService.doc(`send/${interaction.user.id}`).delete();
+                                        })
+                                    })
+                                })
+                            })
+                        })
+                    } else {
+                        dbService.doc(`send/${interaction.user.id}`).delete();
+                        const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setLabel("Confirm").setCustomId("sendconfirm").setStyle(ButtonStyle.Secondary).setDisabled(true), new ButtonBuilder().setLabel("Cancel").setCustomId("sendcancel").setStyle(ButtonStyle.Danger).setDisabled(true));
+                        interaction.message.edit({content: `${interaction.user}, are you sure you want to send ${interaction.options.getInteger("금액")} to ${interaction.options.getUser("유저")}?`, components: [row]});
+                    }
+                } else {
+                    ia.reply({content: "This is not for you.", ephemeral: true})
                 }
                 break;
         }

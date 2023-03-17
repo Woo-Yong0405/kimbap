@@ -6,7 +6,7 @@ const work = new Set();
 module.exports = {
     data: new SlashCommandBuilder().setName("일하기").setDescription("일해서 돈벌기"),
     async execute(message, meme) {
-        await dbService.doc(`User Data/${message.user.id}`).then(async (doc) => {
+        await dbService.doc(`User Data/${message.user.id}`).get().then(async (doc) => {
             if (doc.exists) {
                 if (work.has(message.user.id)) {
                     message.reply("Your cooldown hasn't ended yet.")
