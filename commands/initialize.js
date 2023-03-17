@@ -10,7 +10,7 @@ module.exports = {
             } else {
                 dbService.doc(`User Data/${interaction.user.id}`).set({
                     bank: 0,
-                    wallet: 100
+                    wallet: 10000
                 })
                 await interaction.reply(`${interaction.user.username}'s account has been initialized. Congratulations!`)
             }

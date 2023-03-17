@@ -102,8 +102,8 @@ client.on(Events.InteractionCreate, async (ia) => {
             console.error(`No matching command ${ia.commandName} was found.`)
         }
         try {
-            if (!meme.exists && ia.commandName !== "initialize") {
-                await ia.reply("Please run the command /initialize to open your account first.")
+            if (!meme.exists && ia.commandName !== "셋업") {
+                await ia.reply("Please run the command /셋업 to open your account first.")
             } else {
                 await command.execute(ia, meme)   
             }
